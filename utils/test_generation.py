@@ -139,3 +139,49 @@ def compare_generation_energy(model_name, prompt, quantization_modes=['int4'], v
             print(" | ".join(values))
 
     return results
+
+
+def quick_test_generation(model_name, quant_mode='int4'):
+    """Run a quick test for a single quantization mode on generation task"""
+    print(f"Quick test for {model_name} with {quant_mode} quantization")
+
+    # Load tokenizer
+    tokenizer = AutoTokenizer.from_pretrained(model_name)
+
+    # Load model
+    model = load_llm(model_name, mode=quant_mode)
+
+    # Create energy tracker
+    precision = 'float16' if quant_mode == 'fp16' else None
+    tracker = EnergyTracker(model, precision_mode=precision)
+
+    # Run inference
+    prompt = "DeepSeek AI is an advanced open-source language model designed to power AI applications."
+    print(f"Running inference with prompt: '{prompt}'")
+
+    _, stats = tracker.measure_text(prompt, tokenizer)
+
+    # Calculate carbon footprint
+    carbon_intensity = get_carbon_intensity()
+    carbon_emissions = joules_to_co2(stats['total_energy'], carbon_intensity)
+
+    # Print results
+    print("\nResults:")
+    print(f"Total Energy: {stats['total_energy']:.4f} J")
+    print(f"Energy per token: {stats['energy_per_token']:.6f} J/token")
+    print(f"Inference time: {stats['time']:.3f} s")
+    print(f"Carbon emissions: {carbon_emissions:.6f} gCO2eq")
+
+    # Component breakdown
+    print("\nComponent Energy Breakdown:")
+    total_comp = sum(stats['components'].values())
+    for comp, energy in stats['components'].items():
+        if energy > 0:  # Only show components with energy usage
+            percentage = 100 * energy / total_comp if total_comp > 0 else 0
+            print(f"  {comp}: {energy:.4f} J ({percentage:.1f}%)")
+
+    # Clean up
+    del model, tracker
+    clean_memory()
+
+    return stats
