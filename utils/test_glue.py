@@ -5,7 +5,7 @@ from transformers import (
     BitsAndBytesConfig,
     DataCollatorWithPadding
 )
-from memory_utils import clean_memory, print_gpu_memory
+from utils.memory_utils import clean_memory, print_gpu_memory
 from datasets import load_dataset, concatenate_datasets
 from utils.energy_utils import EnergyTracker, get_carbon_intensity, joules_to_co2
 from torch.utils.data import DataLoader
