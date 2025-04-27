@@ -1,46 +1,86 @@
+#!/usr/bin/env python
+"""
+Script to run MMLU benchmark with energy monitoring on DeepSeek models.
+"""
+
 import os
 import sys
-import torch
 import argparse
 import json
 from datetime import datetime
-
-# Import our testing modules
-from utils.test_mmlu import test_quantized_models_on_mmlu, quick_test_mmlu
-from utils.plot_utils import plot_energy_comparison, plot_component_energy
+import torch
 from utils.memory_utils import clean_memory, print_gpu_memory
+from patched_energy_utils import PatchedEnergyTracker as EnergyTracker, get_carbon_intensity, joules_to_co2
+from utils.test_mmlu import test_quantized_models_on_mmlu, quick_test_mmlu
+import ctypes
+import pynvml
+
 
 def main():
-    parser = argparse.ArgumentParser(description='Test DeepSeek model energy consumption on MMLU benchmark')
+    if not hasattr(pynvml, 'nvmlFieldValue_t'):
+        class nvmlFieldValue_t(ctypes.Structure):
+            _fields_ = [
+                ('fieldId', ctypes.c_uint),
+                ('scopeId', ctypes.c_uint),
+                ('timestamp', ctypes.c_ulonglong),
+                ('latencyUsec', ctypes.c_uint),
+                ('valueType', ctypes.c_uint),
+                ('nvmlReturn', ctypes.c_uint),
+                ('value', ctypes.c_ulonglong),  # Union; simplified
+            ]
+        pynvml.nvmlFieldValue_t = nvmlFieldValue_t
+        print("Patched missing nvmlFieldValue_t struct.")
+        
+
+    # ⚡ NEW PATCH: Patch NVML_FI_DEV_POWER_INSTANT
+    if not hasattr(pynvml, 'NVML_FI_DEV_POWER_INSTANT'):
+        if hasattr(pynvml, 'NVML_FI_DEV_TOTAL_ENERGY_CONSUMPTION'):
+            pynvml.NVML_FI_DEV_POWER_INSTANT = pynvml.NVML_FI_DEV_TOTAL_ENERGY_CONSUMPTION
+            print("Patched missing NVML_FI_DEV_POWER_INSTANT with TOTAL_ENERGY_CONSUMPTION.")
+        else:
+            pynvml.NVML_FI_DEV_POWER_INSTANT = 0
+            print("Patched missing NVML_FI_DEV_POWER_INSTANT with dummy value 0.")
     
-    # Model arguments
-    parser.add_argument('--model', type=str, default="deepseek-ai/deepseek-coder-1.3b-base",
-                        help='DeepSeek model name from HuggingFace')
+    parser = argparse.ArgumentParser(description="Run MMLU benchmark with energy monitoring")
     
-    # Test configuration
-    parser.add_argument('--quantization', type=str, nargs='+', default=['int4'],
-                        choices=['fp16', 'int8', 'int4'], 
-                        help='Quantization modes to test')
-    parser.add_argument('--quick_test', action='store_true',
-                        help='Run a quick test with limited samples')
-    parser.add_argument('--batch_size', type=int, default=1,
-                        help='Batch size for evaluation')
-    parser.add_argument('--max_samples', type=int, default=50,
-                        help='Maximum number of samples to evaluate per subject')
+    # Model selection
+    parser.add_argument("--model", type=str, default="deepseek-ai/deepseek-coder-1.3b-base",
+                       help="DeepSeek model to test")
     
-    # MMLU-specific arguments
-    parser.add_argument('--subjects', type=str, nargs='+', default=None,
-                        help='List of MMLU subjects to evaluate (None for all)')
+    # Quantization options
+    parser.add_argument("--quantization", type=str, nargs="+", default=["int4"],
+                       choices=["fp16", "int8", "int4"],
+                       help="Quantization modes to test")
     
-    # Output arguments
-    parser.add_argument('--output_dir', type=str, default='results',
-                        help='Directory to save results')
-    parser.add_argument('--plot', action='store_true',
-                        help='Generate energy consumption plots')
+    # MMLU options
+    parser.add_argument("--subjects", type=str, nargs="+", 
+                       default=["high_school_mathematics", "high_school_physics"],
+                       help="MMLU subjects to test")
+    parser.add_argument("--max_samples", type=int, default=50,
+                       help="Maximum number of samples to test per subject")
+    
+    # Test mode
+    parser.add_argument("--quick", action="store_true",
+                       help="Run quick test with minimal samples")
+    
+    # Output options
+    parser.add_argument("--output_dir", type=str, default="results",
+                       help="Directory to save results")
     
     args = parser.parse_args()
     
-    # Print GPU info
+    # Create output directory
+    os.makedirs(args.output_dir, exist_ok=True)
+    
+    # Print setup information
+    print("\n===== MMLU Benchmark Setup =====")
+    print(f"Model: {args.model}")
+    print(f"Quantization modes: {', '.join(args.quantization)}")
+    print(f"Subjects: {', '.join(args.subjects)}")
+    print(f"Max samples: {args.max_samples}")
+    print(f"Output directory: {args.output_dir}")
+    
+    # Print GPU information
     print("\n===== GPU Information =====")
     if torch.cuda.is_available():
         print(f"CUDA available: {torch.cuda.is_available()}")
@@ -51,78 +91,44 @@ def main():
         print("CUDA is not available. This test requires a GPU.")
         return
     
-    # Create output directory
-    os.makedirs(args.output_dir, exist_ok=True)
-    
-    # Generate timestamp for unique results
+    # Run benchmark
     timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+    results_file = os.path.join(args.output_dir, f"mmlu_results_{timestamp}.json")
     
-    # Set up result file paths
-    result_file = os.path.join(args.output_dir, f"mmlu_energy_{timestamp}.json")
-    
-    # Run tests
-    results = {}
-    
-    if args.quick_test:
+    if args.quick:
+        # Run quick test with first quantization mode
         print("\n===== Running Quick MMLU Test =====")
-        mode = args.quantization[0]  # Use first mode for quick test
-        quick_results = quick_test_mmlu(
+        mode = args.quantization[0]
+        results = quick_test_mmlu(
             model_name=args.model,
             quant_mode=mode,
             subjects=args.subjects,
             max_samples=min(10, args.max_samples)  # Limit to 10 samples for quick test
         )
         
-        results[f'quick_test_{mode}'] = quick_results
-        
         # Save quick test results
-        quick_result_file = os.path.join(args.output_dir, f"mmlu_quick_test_{timestamp}.json")
-        with open(quick_result_file, 'w') as f:
-            json.dump(results, f, indent=2)
-        print(f"Quick test results saved to {quick_result_file}")
+        with open(results_file, 'w') as f:
+            json.dump({f"{mode}_quick_test": results}, f, indent=2)
+            
+        print(f"Quick test results saved to {results_file}")
+        
     else:
-        print("\n===== Running Full MMLU Benchmark =====")
-        test_results = test_quantized_models_on_mmlu(
+        # Run full benchmark
+        print("\n===== Running MMLU Benchmark =====")
+        results = test_quantized_models_on_mmlu(
             model_name=args.model,
             subjects=args.subjects,
             quantization_modes=args.quantization,
-            batch_size=args.batch_size,
-            max_samples=args.max_samples
+            batch_size=1  # Using batch_size=1 to minimize memory usage
         )
         
-        results['mmlu'] = test_results
-        
-        # Save full test results
-        with open(result_file, 'w') as f:
+        # Save full benchmark results
+        with open(results_file, 'w') as f:
             json.dump(results, f, indent=2)
-        print(f"Full benchmark results saved to {result_file}")
-        
-        # Generate plots if requested
-        if args.plot:
-            try:
-                print("\n===== Generating Energy Consumption Plots =====")
-                
-                # Format results for plotting
-                plot_data = {'generation': {}}  # The plot_utils expects 'generation' key
-                for mode in args.quantization:
-                    if mode in test_results and 'total_energy' in test_results[mode]:
-                        # Copy results to the expected structure
-                        plot_data['generation'][mode] = test_results[mode]
-                
-                # Generate plots
-                if len(args.quantization) > 1:
-                    plot_energy_comparison(plot_data)
-                
-                # Plot component energy for each mode
-                for mode in args.quantization:
-                    if mode in test_results and 'component_energy' in test_results[mode]:
-                        plot_component_energy(plot_data, quant_mode=mode)
-                
-                print("Plots generated successfully.")
-            except Exception as e:
-                print(f"Error generating plots: {e}")
+            
+        print(f"Benchmark results saved to {results_file}")
     
-    print("\n===== Testing Complete =====")
+    print("\n===== Benchmark Complete =====")
 
 if __name__ == "__main__":
     main()
