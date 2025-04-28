@@ -2,19 +2,19 @@ from transformers import (
     AutoModelForCausalLM,
     AutoModelForSequenceClassification,
     AutoTokenizer,
-    BitsAndBytesConfig
+    BitsAndBytesConfig,
+    DataCollatorWithPadding
 )
 from utils.memory_utils import clean_memory, print_gpu_memory
-from datasets import load_dataset
+from datasets import load_dataset, concatenate_datasets
 from utils.energy_utils import EnergyTracker, get_carbon_intensity, joules_to_co2
 from torch.utils.data import DataLoader
 import torch
 from sklearn.metrics import accuracy_score
 import numpy as np
 from utils.load_llm import load_llm, load_classifier
-import os
 
-def run_mmlu_energy_monitoring(model, tokenizer, subjects=None, batch_size=1, precision_mode=None, max_samples=50):
+def run_mmlu_energy_monitoring(model, tokenizer, subjects=None, batch_size=1, precision_mode=None):
     """
     Run MMLU benchmark with energy monitoring, optimized for memory constraints
 
@@ -24,7 +24,6 @@ def run_mmlu_energy_monitoring(model, tokenizer, subjects=None, batch_size=1, pr
         subjects: List of MMLU subjects to evaluate (None for all)
         batch_size: Batch size for evaluation (default=1 to minimize memory usage)
         precision_mode: Precision mode for inference
-        max_samples: Maximum number of samples to evaluate per subject
 
     Returns:
         key_metrics: Batch-level metrics
@@ -64,6 +63,7 @@ def run_mmlu_energy_monitoring(model, tokenizer, subjects=None, batch_size=1, pr
         print(f"  {subject}: {count} examples")
 
     # Use only a small subset to save memory
+    max_samples = 50  # Limit to 50 samples to save memory
     if len(validation_dataset) > max_samples:
         print(f"Limiting validation dataset to {max_samples} samples (from {len(validation_dataset)})")
         validation_dataset = validation_dataset.select(range(max_samples))
@@ -94,7 +94,6 @@ def run_mmlu_energy_monitoring(model, tokenizer, subjects=None, batch_size=1, pr
 
     # Show dataset info
     print(f"Dataset columns after processing: {encoded_dataset.column_names}")
-    print(f"Number of examples: {len(encoded_dataset)}")
 
     # Keep only the necessary columns
     columns_to_keep = ['input_ids', 'attention_mask', 'labels', 'subject']
@@ -102,6 +101,9 @@ def run_mmlu_energy_monitoring(model, tokenizer, subjects=None, batch_size=1, pr
         [col for col in encoded_dataset.column_names if col not in columns_to_keep]
     )
     encoded_dataset.set_format('torch', columns=['input_ids', 'attention_mask', 'labels'])
+
+    print(f"Final dataset format: {encoded_dataset.format}")
+    print(f"Dataset ready with {len(encoded_dataset)} examples")
 
     # Create DataLoader with minimal batch size
     dataloader = DataLoader(encoded_dataset, batch_size=batch_size)
@@ -123,7 +125,7 @@ def run_mmlu_energy_monitoring(model, tokenizer, subjects=None, batch_size=1, pr
     clean_memory()
 
     # Process only a few batches for memory safety
-    max_batch_eval = min(50, len(dataloader))
+    max_batch_eval = min(20, len(dataloader))
 
     for batch_idx, batch in enumerate(dataloader):
         if batch_idx >= max_batch_eval:
@@ -148,7 +150,7 @@ def run_mmlu_energy_monitoring(model, tokenizer, subjects=None, batch_size=1, pr
                 attention_mask = batch['attention_mask'].to('cuda')
                 labels = batch['labels'].to('cuda')
                 
-                # Store subjects
+                # Store subjects for analysis
                 if 'subject' in batch:
                     subjects_in_batch = batch['subject']
                     all_subjects.extend(subjects_in_batch)
@@ -177,7 +179,8 @@ def run_mmlu_energy_monitoring(model, tokenizer, subjects=None, batch_size=1, pr
                 'time': energy_metrics['time'],
                 'tokens': energy_metrics['num_tokens'],
                 'energy_per_token': energy_metrics['energy_per_token'],
-                'components': energy_metrics['components']
+                'components': energy_metrics['components'],
+                'subjects': subjects_in_batch if 'subject' in batch else []
             }
             key_metrics.append(batch_metrics)
 
@@ -188,15 +191,15 @@ def run_mmlu_energy_monitoring(model, tokenizer, subjects=None, batch_size=1, pr
             print(f"Error processing batch {batch_idx}: {e}")
             continue
 
-    # Calculate MMLU accuracy
+    # Calculate MMLU score (accuracy)
     if len(all_predictions) == 0 or len(all_true_labels) == 0:
         print("No valid predictions were made. Cannot calculate metrics.")
         return [], {"error": "No valid predictions"}
 
     try:
         # Overall accuracy
-        accuracy = accuracy_score(all_true_labels, all_predictions)
-        print(f"Overall MMLU accuracy: {accuracy:.4f}")
+        score = accuracy_score(all_true_labels, all_predictions)
+        print(f"MMLU overall accuracy: {score:.4f}")
         
         # Subject-wise accuracy if subjects are available
         subject_metrics = {}
@@ -212,10 +215,9 @@ def run_mmlu_energy_monitoring(model, tokenizer, subjects=None, batch_size=1, pr
                     'count': len(indices)
                 }
                 print(f"Subject: {subject}, Accuracy: {subject_acc:.4f}, Count: {len(indices)}")
-        
     except Exception as e:
-        print(f"Error calculating accuracy: {e}")
-        accuracy = 0
+        print(f"Error calculating score: {e}")
+        score = 0
 
     # Aggregate metrics
     if len(key_metrics) == 0:
@@ -234,7 +236,7 @@ def run_mmlu_energy_monitoring(model, tokenizer, subjects=None, batch_size=1, pr
     # Summary metrics
     avg_metrics = {
         'benchmark': 'mmlu',
-        'accuracy': accuracy,
+        'score': score,
         'total_energy': total_energy,
         'energy_per_token': total_energy / total_tokens if total_tokens > 0 else 0,
         'throughput': total_tokens / total_time if total_time > 0 else 0,
@@ -264,7 +266,7 @@ def run_mmlu_energy_monitoring(model, tokenizer, subjects=None, batch_size=1, pr
     return key_metrics, clean_avg_metrics
 
 
-def test_quantized_models_on_mmlu(model_name, subjects=None, quantization_modes=['int4'], batch_size=1, max_samples=50):
+def test_quantized_models_on_mmlu(model_name, subjects=None, quantization_modes=['int4'], batch_size=1):
     """
     Test different quantization modes on MMLU benchmark
 
@@ -273,7 +275,6 @@ def test_quantized_models_on_mmlu(model_name, subjects=None, quantization_modes=
         subjects: List of MMLU subjects to evaluate (None for all)
         quantization_modes: List of quantization modes to test
         batch_size: Batch size for evaluation
-        max_samples: Maximum number of samples to evaluate per subject
 
     Returns:
         Dictionary with results for each quantization mode
@@ -296,11 +297,11 @@ def test_quantized_models_on_mmlu(model_name, subjects=None, quantization_modes=
             # Clear GPU memory
             clean_memory()
 
-            # Load classifier model (for MMLU, we need 4 output classes for A, B, C, D)
+            # Load classifier model with 4 classes (A, B, C, D choices in MMLU)
             model = load_classifier(
                 model_name=model_name,
                 mode=mode,
-                num_labels=4  # MMLU has 4 choices (A, B, C, D)
+                num_labels=4  # MMLU has 4 choices
             )
 
             # Create energy tracker
@@ -314,8 +315,7 @@ def test_quantized_models_on_mmlu(model_name, subjects=None, quantization_modes=
                 tokenizer=tokenizer,
                 subjects=subjects,
                 batch_size=batch_size,
-                precision_mode=precision,
-                max_samples=max_samples
+                precision_mode=precision
             )
 
             # Check for errors
@@ -334,7 +334,7 @@ def test_quantized_models_on_mmlu(model_name, subjects=None, quantization_modes=
             # Print results
             print(f"Total Energy: {metrics['total_energy']:.4f} J")
             print(f"Energy per token: {metrics['energy_per_token']:.6f} J/token")
-            print(f"MMLU Accuracy: {metrics['accuracy']:.4f}")
+            print(f"MMLU Score: {metrics['score']:.4f}")
             print(f"Carbon emissions: {carbon_emissions:.6f} gCO2eq")
 
             # Print component breakdown
@@ -361,9 +361,9 @@ def test_quantized_models_on_mmlu(model_name, subjects=None, quantization_modes=
     if len(modes_with_data) >= 2:
         # Find highest energy mode as baseline
         baseline_mode = max(modes_with_data, key=lambda m: results[m]['total_energy'])
-        baseline = results[mode][baseline_mode]['total_energy']
+        baseline = results[baseline_mode]['total_energy']
 
-        print(f"\n----- Efficiency Comparison for MMLU -----")
+        print(f"\n----- Efficiency Comparison -----")
         print(f"Using {baseline_mode.upper()} as baseline ({baseline:.4f} J)")
 
         for mode in modes_with_data:
@@ -371,6 +371,25 @@ def test_quantized_models_on_mmlu(model_name, subjects=None, quantization_modes=
                 savings = 100 * (baseline - results[mode]['total_energy']) / baseline
                 results[mode]['energy_savings'] = savings
                 print(f"{mode.upper()} saves {savings:.2f}% energy compared to {baseline_mode.upper()}")
+
+    # Display summary table
+    print("\n===== Summary Table =====")
+    headers = ["Mode", "Energy (J)", "Time (s)", "Energy/Token (J)", "MMLU Score", "CO2 (gCO2eq)"]
+    print(" | ".join(headers))
+    print("-" * 80)
+
+    for mode in quantization_modes:
+        if mode in results and 'total_energy' in results[mode]:
+            stats = results[mode]
+            values = [
+                mode.upper(),
+                f"{stats['total_energy']:.4f}",
+                f"{stats['total_time']:.3f}",
+                f"{stats['energy_per_token']:.6f}",
+                f"{stats['score']:.4f}",
+                f"{stats.get('carbon_emissions', 0):.6f}"
+            ]
+            print(" | ".join(values))
 
     return results
 
@@ -382,21 +401,21 @@ def quick_test_mmlu(model_name, quant_mode='int4', subjects=None, max_samples=10
     # Load tokenizer
     tokenizer = AutoTokenizer.from_pretrained(model_name)
 
-    # Load model (for MMLU, we need 4 output classes for A, B, C, D)
+    # Load model with 4 classes (A, B, C, D choices in MMLU)
     model = load_classifier(model_name, mode=quant_mode, num_labels=4)
 
     # Create energy tracker
     precision = 'float16' if quant_mode == 'fp16' else None
     tracker = EnergyTracker(model, precision_mode=precision)
 
-    # Run energy monitoring
+    # Run MMLU benchmark with limited samples
+    print(f"Running MMLU benchmark with {max_samples} samples...")
     _, metrics = run_mmlu_energy_monitoring(
         model=model,
         tokenizer=tokenizer,
         subjects=subjects,
         batch_size=1,
-        precision_mode=precision,
-        max_samples=max_samples
+        precision_mode=precision
     )
 
     # Calculate carbon footprint
@@ -408,7 +427,7 @@ def quick_test_mmlu(model_name, quant_mode='int4', subjects=None, max_samples=10
     print("\nResults:")
     print(f"Total Energy: {metrics['total_energy']:.4f} J")
     print(f"Energy per token: {metrics['energy_per_token']:.6f} J/token")
-    print(f"MMLU Accuracy: {metrics['accuracy']:.4f}")
+    print(f"MMLU Score: {metrics['score']:.4f}")
     print(f"Inference time: {metrics['total_time']:.3f} s")
     print(f"Carbon emissions: {carbon_emissions:.6f} gCO2eq")
 
@@ -428,45 +447,22 @@ def quick_test_mmlu(model_name, quant_mode='int4', subjects=None, max_samples=10
 
 
 if __name__ == "__main__":
-    # Example usage:
-    
-    # DeepSeek model
+    # Example usage
     model_name = "deepseek-ai/deepseek-coder-1.3b-base"
+    subjects = ["high_school_mathematics", "high_school_physics"]
     
     # Run quick test
-    print("\n===== Quick MMLU Test =====")
     quick_test_mmlu(
         model_name=model_name,
         quant_mode='int4',
-        subjects=['high_school_mathematics', 'high_school_physics'],
+        subjects=subjects,
         max_samples=10
     )
     
-    # Run full test with different quantization modes
-    print("\n===== Full MMLU Test =====")
-    results = test_quantized_models_on_mmlu(
+    # Run full test
+    test_quantized_models_on_mmlu(
         model_name=model_name,
-        subjects=['high_school_mathematics', 'high_school_physics'],
-        quantization_modes=['int4', 'int8'],  # Removed 'fp16' as it's memory intensive
-        batch_size=1,
-        max_samples=20
+        subjects=subjects,
+        quantization_modes=['int4', 'int8'],
+        batch_size=1
     )
-    
-    # Print summary
-    print("\n===== Summary Table =====")
-    headers = ["Mode", "Energy (J)", "Time (s)", "Energy/Token (J)", "Accuracy", "CO2 (gCO2eq)"]
-    print(" | ".join(headers))
-    print("-" * 80)
-    
-    for mode in ['int4', 'int8']:
-        if mode in results and 'total_energy' in results[mode]:
-            stats = results[mode]
-            values = [
-                mode.upper(),
-                f"{stats['total_energy']:.4f}",
-                f"{stats['total_time']:.3f}",
-                f"{stats['energy_per_token']:.6f}",
-                f"{stats['accuracy']:.4f}",
-                f"{stats.get('carbon_emissions', 0):.6f}"
-            ]
-            print(" | ".join(values))
