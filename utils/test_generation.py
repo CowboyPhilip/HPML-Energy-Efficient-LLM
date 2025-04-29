@@ -252,11 +252,13 @@ def test_generation_MBPP(model_name, quantization_modes=['fp16'], verbose=True):
             tracker = EnergyTracker(model, precision_mode=precision)
 
             for example in tqdm(dataset, desc=f"Testing {mode.upper()}"):
-                header_for_clean_output = "Please write only a clean Python function based on the following instruction, without any extra explanation:"
+                header_for_clean_output = "output only the code, no explanation: "
                 if "Qwen" in model_name:
                     prompt = header_for_clean_output + example['text']
                 elif "coder" in model_name:
-                    prompt = example['text']
+                    # prompt = example['text']
+                    prompt = header_for_clean_output + example['text']
+                    # print(f"===== the prompt is {prompt} =====")
                 else:
                     print("unknown deepseek version, use original MBPP text, may lead to low code generation acc")
                     prompt = example['text']
