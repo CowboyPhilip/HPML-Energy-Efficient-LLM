@@ -252,14 +252,21 @@ def test_generation_MBPP(model_name, quantization_modes=['fp16'], verbose=True):
             tracker = EnergyTracker(model, precision_mode=precision)
 
             for example in tqdm(dataset, desc=f"Testing {mode.upper()}"):
-                prompt = example['text']
+                header_for_clean_output = "Please write only a clean Python function based on the following instruction, without any extra explanation:"
+                if "Qwen" in model_name:
+                    prompt = header_for_clean_output + example['text']
+                elif "coder" in model_name:
+                    prompt = example['text']
+                else:
+                    print("unknown deepseek version, use original MBPP text, may lead to low code generation acc")
+                    prompt = example['text']
                 ground_truth_code = example['code']
                 test_cases = example['test_list']
                 
                 try:
                     # Inference
                     if mode == 'fp16':
-                        tokens = tokenizer(prompt, return_tensors='pt', truncation=True, max_length=32)
+                        tokens = tokenizer(prompt, return_tensors='pt', truncation=True, max_length=512)
                         logits, stats = tracker.measure_text(tokens.input_ids, tokenizer)
                     else:
                         logits, stats = tracker.measure_text(prompt, tokenizer)
@@ -270,7 +277,7 @@ def test_generation_MBPP(model_name, quantization_modes=['fp16'], verbose=True):
 
                 except torch.cuda.OutOfMemoryError:
                     print(f"OOM in {mode}, truncating input...")
-                    tokens = tokenizer(prompt, return_tensors='pt', truncation=True, max_length=32)
+                    tokens = tokenizer(prompt, return_tensors='pt', truncation=True, max_length=256)
                     logits, stats = tracker.measure_text(tokens.input_ids, tokenizer)
                     generated_tokens = torch.argmax(logits, dim=-1)
                     generated_text = tokenizer.batch_decode(generated_tokens, skip_special_tokens=True)[0]
@@ -298,7 +305,7 @@ def test_generation_MBPP(model_name, quantization_modes=['fp16'], verbose=True):
 
     # Summarize
     print("\n===== Summary =====")
-    headers = ["Mode", "Avg Energy (J)", "Avg Time (s)", "Energy/Token (J)", "Accuracy (%)", "CO2 (gCO2eq)"]
+    headers = ["Mode", "Avg Energy per Infer(J)", "Avg Time per Infer (s)", "Energy/Token (J)", "Accuracy (%)", "CO2 (gCO2eq)"]
     print(" | ".join(headers))
     print("-" * 100)
 
@@ -330,4 +337,26 @@ def test_generation_MBPP(model_name, quantization_modes=['fp16'], verbose=True):
                 "total_examples": count
             }
 
+
+            # print("\nComponent Energy Breakdown:")
+            # total_comp = sum(stats['components'].values())
+            # for comp, energy in stats['components'].items():
+            #     if energy > 0:  # Only show components with energy usage
+            #         percentage = 100 * energy / total_comp if total_comp > 0 else 0
+            #         print(f"  {comp}: {energy:.4f} J ({percentage:.1f}%)")
+
+            component_totals = {}
+            for ex in examples:
+                for comp, energy in ex["stats"]["components"].items():
+                    if comp not in component_totals:
+                        component_totals[comp] = 0.0
+                    component_totals[comp] += energy
+
+            grand_total = sum(component_totals.values())
+
+            print("\nComponent Energy Breakdown for", mode.upper())
+            for comp, energy in sorted(component_totals.items(), key=lambda x: -x[1]):  # sort descending
+                if energy > 0:
+                    perc = 100 * energy / grand_total if grand_total > 0 else 0
+                    print(f"  {comp}: {energy:.4f} J ({perc:.1f}%)")
     return results
