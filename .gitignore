@@ -1,0 +1,85 @@
+# ------------------------------
+# Python cache and compiled files
+# ------------------------------
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.so
+
+# Bytecode cache for specific Python versions
+*.pyc
+
+# C extensions
+build/
+dist/
+*.egg-info/
+
+# ------------------------------
+# Virtual environments
+# ------------------------------
+env/
+venv/
+.venv/
+ENV/
+*.env
+
+# ------------------------------
+# Jupyter Notebook
+# ------------------------------
+.ipynb_checkpoints/
+
+# Google Colab temporary files
+*.ipynb (Colab auto saves)
+# (You may want to version-control final notebooks only)
+
+# Jupyter runtime files (e.g., kernels)
+~$*.ipynb
+*.nbconvert.ipynb
+
+# ------------------------------
+# VS Code settings
+# ------------------------------
+.vscode/
+.history/
+
+# ------------------------------
+# macOS / Linux / Windows OS junk
+# ------------------------------
+.DS_Store
+Thumbs.db
+ehthumbs.db
+Icon?
+._*
+
+# ------------------------------
+# Logs and system files
+# ------------------------------
+*.log
+*.out
+*.bak
+*.swp
+*.tmp
+
+# ------------------------------
+# Environment/config files (if not intended for sharing)
+# ------------------------------
+*.env
+.env.*
+*.token
+*.secret
+secrets.yaml
+config.yaml
+config.json
+
+# ------------------------------
+# Pip/conda environment exports (optional)
+# ------------------------------
+# If you want to version these, remove the comments
+# requirements.txt
+# environment.yml
+
+# ------------------------------
+# Jupyter Notebook local server security
+# ------------------------------
+.jupyter/

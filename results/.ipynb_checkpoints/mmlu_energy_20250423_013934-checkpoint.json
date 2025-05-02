@@ -1,7 +1,0 @@
-{
-  "mmlu": {
-    "int4": {
-      "error": "Using a `device_map` or `tp_plan` requires `accelerate`. You can install it with `pip install accelerate`"
-    }
-  }
-}
