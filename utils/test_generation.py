@@ -226,7 +226,7 @@ def evaluate_generated_code(generated_code, test_cases):
         # If any error happens (syntax error, wrong output, etc.), the function is incorrect
         return False
     
-def test_generation_MBPP(model_name, quantization_modes=['fp16'], verbose=True):
+def test_generation_MBPP(model_name, quantization_modes=['fp16'], num_examples = 500, verbose=True):
     """
     Test MBPP dataset with energy tracking and pass@1 accuracy, recording full stats.
     """
@@ -252,7 +252,10 @@ def test_generation_MBPP(model_name, quantization_modes=['fp16'], verbose=True):
             precision = 'float16' if mode == 'fp16' else None
             tracker = EnergyTracker(model, precision_mode=precision)
 
-            for example in tqdm(dataset, desc=f"Testing {mode.upper()}"):
+            # for example in tqdm(dataset, desc=f"Testing {mode.upper()}"):
+            for i, example in enumerate(tqdm(dataset, desc=f"Testing {mode.upper()}")):
+                if i >= num_examples:
+                    break
                 header_for_clean_output = "output only the code, no explanation: "
                 if "Qwen" in model_name:
                     prompt = header_for_clean_output + example['text']
