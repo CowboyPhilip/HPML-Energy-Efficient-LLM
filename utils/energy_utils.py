@@ -1,5 +1,6 @@
 from zeus.monitor import ZeusMonitor
 import torch
+import torch.nn as nn
 from functools import partial
 import numpy as np
 import time
@@ -30,7 +31,7 @@ class EnergyTracker:
             print("Falling back to simple time measurement without energy tracking")
             self.zeus = None
 
-        # Energy consumption
+        # Energy consumption buckets
         self.comp_energy = {
             'embeddings': [],
             'attention': [],
@@ -39,177 +40,117 @@ class EnergyTracker:
             'output_layer': []
         }
 
-        # Register hooks only if zeus monitor is available
+        # Register hooks if ZeusMonitor is available
         if self.zeus is not None:
             self._register_hooks()
         else:
             print("Skipping hook registration since ZeusMonitor is not available")
 
     def _register_hooks(self):
-        """Register hooks based on model type"""
+        """Register hooks based on model type; fallback to Linear/Conv1D if unknown."""
+        modules_to_hook = []
+
+        # GPT-style causal LM
         if hasattr(self.model, 'model') and hasattr(self.model.model, 'layers'):
-            # For CausalLM models
             base = self.model.model
-
-            # Register hooks for embeddings
+            # embeddings
             if hasattr(base, 'embed_tokens'):
-                base.embed_tokens.register_forward_pre_hook(
-                    partial(self._hook_begin, 'embeddings')
-                )
-                base.embed_tokens.register_forward_hook(
-                    partial(self._hook_end, 'embeddings')
-                )
-
-            # Register hooks for attention & FFN in each layer
+                modules_to_hook.append((base.embed_tokens, 'embeddings'))
+            # each layer
             for layer in base.layers:
                 if hasattr(layer, 'self_attn'):
-                    layer.self_attn.register_forward_pre_hook(
-                        partial(self._hook_begin, 'attention')
-                    )
-                    layer.self_attn.register_forward_hook(
-                        partial(self._hook_end, 'attention')
-                    )
-
+                    modules_to_hook.append((layer.self_attn, 'attention'))
                 if hasattr(layer, 'mlp'):
-                    layer.mlp.register_forward_pre_hook(
-                        partial(self._hook_begin, 'ffn')
-                    )
-                    layer.mlp.register_forward_hook(
-                        partial(self._hook_end, 'ffn')
-                    )
-
-            # Register hook for final LayerNorm
+                    modules_to_hook.append((layer.mlp, 'ffn'))
+            # final norm
             if hasattr(base, 'norm'):
-                base.norm.register_forward_pre_hook(
-                    partial(self._hook_begin, 'layernorm')
-                )
-                base.norm.register_forward_hook(
-                    partial(self._hook_end, 'layernorm')
-                )
-
-            # Register hook for output layer
+                modules_to_hook.append((base.norm, 'layernorm'))
+            # lm_head
             if hasattr(self.model, 'lm_head'):
-                self.model.lm_head.register_forward_pre_hook(
-                    partial(self._hook_begin, 'output_layer')
-                )
-                self.model.lm_head.register_forward_hook(
-                    partial(self._hook_end, 'output_layer')
-                )
+                modules_to_hook.append((self.model.lm_head, 'output_layer'))
+
+        # BERT-like classification
         elif hasattr(self.model, 'bert') or hasattr(self.model, 'distilbert'):
-            # For SequenceClassification models (BERT-like)
             if hasattr(self.model, 'bert'):
                 base = self.model.bert
                 classifier = self.model.classifier
-            elif hasattr(self.model, 'distilbert'):
+            else:
                 base = self.model.distilbert
                 classifier = self.model.classifier
-            else:
-                print("Warning: Unknown model architecture. Energy tracking may be incomplete.")
-                return
 
-            # Register embeddings hooks
+            # embeddings
             if hasattr(base, 'embeddings'):
-                base.embeddings.register_forward_pre_hook(
-                    partial(self._hook_begin, 'embeddings')
-                )
-                base.embeddings.register_forward_hook(
-                    partial(self._hook_end, 'embeddings')
-                )
-
-            # Register encoder layer hooks
+                modules_to_hook.append((base.embeddings, 'embeddings'))
+            # encoder layers
             if hasattr(base, 'encoder'):
                 for layer in base.encoder.layer:
                     if hasattr(layer, 'attention'):
-                        layer.attention.register_forward_pre_hook(
-                            partial(self._hook_begin, 'attention')
-                        )
-                        layer.attention.register_forward_hook(
-                            partial(self._hook_end, 'attention')
-                        )
-
+                        modules_to_hook.append((layer.attention, 'attention'))
                     if hasattr(layer, 'intermediate'):
-                        layer.intermediate.register_forward_pre_hook(
-                            partial(self._hook_begin, 'ffn')
-                        )
-                        layer.intermediate.register_forward_hook(
-                            partial(self._hook_end, 'ffn')
-                        )
+                        modules_to_hook.append((layer.intermediate, 'ffn'))
+            # classifier head
+            modules_to_hook.append((classifier, 'output_layer'))
 
-            # Register classifier hooks
-            classifier.register_forward_pre_hook(
-                partial(self._hook_begin, 'output_layer')
-            )
-            classifier.register_forward_hook(
-                partial(self._hook_end, 'output_layer')
-            )
+        # Fallback: hook all nn.Linear and HuggingFace Conv1D layers
+        if not modules_to_hook:
+            for m in self.model.modules():
+                if isinstance(m, nn.Linear) or m.__class__.__name__ == 'Conv1D':
+                    modules_to_hook.append((m, 'ffn'))
+
+        # Register hooks or warn if none found
+        if modules_to_hook:
+            for module, name in modules_to_hook:
+                module.register_forward_pre_hook(partial(self._hook_begin, name))
+                module.register_forward_hook(partial(self._hook_end, name))
         else:
             print("Warning: Unsupported model architecture. Energy tracking may be incomplete.")
 
     def _hook_begin(self, name, module, inp):
         """Pre-forward hook to start energy measurement"""
-        if self.zeus is not None:
-            torch.cuda.synchronize()
-            try:
-                # Check if window is already active
-                if name in self.active_windows:
-                    print(f"Warning: Measurement window '{name}' already exists. Skipping.")
-                    return
-
-                self.zeus.begin_window(name)
-                self.active_windows.add(name)
-            except Exception as e:
-                print(f"Error in begin_window for {name}: {e}")
+        if self.zeus is None:
+            return
+        torch.cuda.synchronize()
+        if name in self.active_windows:
+            return
+        try:
+            self.zeus.begin_window(name)
+            self.active_windows.add(name)
+        except Exception as e:
+            print(f"Error in begin_window for {name}: {e}")
 
     def _hook_end(self, name, module, inp, out):
         """Post-forward hook to end energy measurement and record results"""
-        if self.zeus is not None:
-            torch.cuda.synchronize()
-            try:
-                # Check if window is active
-                if name not in self.active_windows:
-                    print(f"Warning: Measurement window '{name}' not found. Skipping.")
-                    return
-
-                e = self.zeus.end_window(name).total_energy
-                self.comp_energy[name].append(e)
-                self.active_windows.remove(name)
-            except Exception as e:
-                print(f"Error in end_window for {name}: {e}")
-                # Force remove from active windows to prevent future errors
-                if name in self.active_windows:
-                    self.active_windows.remove(name)
+        if self.zeus is None:
+            return
+        torch.cuda.synchronize()
+        if name not in self.active_windows:
+            return
+        try:
+            e = self.zeus.end_window(name).total_energy
+            self.comp_energy[name].append(e)
+            self.active_windows.remove(name)
+        except Exception as e:
+            print(f"Error in end_window for {name}: {e}")
+            self.active_windows.discard(name)
 
     def measure_text(self, text, tokenizer):
-        """
-        Measure energy consumption for text generation
-
-        Args:
-            text: Text prompt or tokenized input
-            tokenizer: HuggingFace tokenizer
-
-        Returns:
-            (logits, metrics_dict)
-        """
-        # Clear component energy tracking
+        """Measure energy for a generation prompt."""
+        # clear prior data
         for v in self.comp_energy.values():
             v.clear()
-
-        # Ensure no active windows before starting
-        if self.zeus is not None:
-            for window in list(self.active_windows):
-                print(f"Warning: Closing stale measurement window '{window}'")
+        if self.zeus:
+            for w in list(self.active_windows):
                 try:
-                    self.zeus.end_window(window)
+                    self.zeus.end_window(w)
                 except:
                     pass
-                self.active_windows.remove(window)
+                self.active_windows.discard(w)
 
-        # Start measurement
         start_time = time.time()
 
-        # Tokenization
+        # tokenization measurement
         tok_energy = 0
-        if self.zeus is not None:
+        if self.zeus:
             try:
                 self.zeus.begin_window('tokenization')
                 self.active_windows.add('tokenization')
@@ -217,37 +158,32 @@ class EnergyTracker:
                 print(f"Error starting tokenization measurement: {e}")
 
         if isinstance(text, str):
-            tokens = tokenizer(text, return_tensors='pt', padding=True, truncation=True, max_length=64)
+            tokens = tokenizer(text, return_tensors='pt',
+                               padding=True, truncation=True, max_length=64)
         else:
-            # Assume text is already tokenized
             tokens = {"input_ids": text}
 
-        if self.zeus is not None and 'tokenization' in self.active_windows:
+        if self.zeus and 'tokenization' in self.active_windows:
             try:
                 tok_meas = self.zeus.end_window('tokenization')
-                self.active_windows.remove('tokenization')
                 tok_energy = tok_meas.total_energy
+                self.active_windows.remove('tokenization')
             except Exception as e:
                 print(f"Error ending tokenization measurement: {e}")
-                self.active_windows.remove('tokenization')
+                self.active_windows.discard('tokenization')
 
-        # Handle different input formats
-        if isinstance(text, str):
-            input_ids = tokens.input_ids.to('cuda')
-            attention_mask = tokens.get('attention_mask', None)
-            if attention_mask is not None:
-                attention_mask = attention_mask.to('cuda')
-        else:
-            # If input is already tensors
-            input_ids = text.to('cuda') if not text.is_cuda else text
-            attention_mask = None
+        # prepare input
+        input_ids = tokens["input_ids"].to('cuda')
+        attention_mask = tokens.get("attention_mask")
+        if attention_mask is not None:
+            attention_mask = attention_mask.to('cuda')
 
-        # Set precision mode
-        dtype = torch.float16 if self.precision_mode == 'float16' else torch.float32
+        # set dtype
+        dtype = torch.float16 if self.precision_mode=='float16' else torch.float32
 
-        # Inference energy consumption
+        # inference measurement
         inf_energy = 0
-        if self.zeus is not None:
+        if self.zeus:
             try:
                 self.zeus.begin_window('inference')
                 self.active_windows.add('inference')
@@ -258,73 +194,51 @@ class EnergyTracker:
             with torch.no_grad(), torch.amp.autocast(device_type="cuda", dtype=dtype):
                 outputs = self.model(input_ids, attention_mask=attention_mask)
         except Exception as e:
-            print(f"Error during model inference: {e}")
-            if self.zeus is not None and 'inference' in self.active_windows:
-                try:
-                    self.zeus.end_window('inference')
-                except:
-                    pass
-                self.active_windows.remove('inference')
+            if self.zeus and 'inference' in self.active_windows:
+                try: self.zeus.end_window('inference')
+                except: pass
+                self.active_windows.discard('inference')
             raise e
 
-        if self.zeus is not None and 'inference' in self.active_windows:
+        if self.zeus and 'inference' in self.active_windows:
             try:
-                inf_meas = self.zeus.end_window('inference')
+                meas = self.zeus.end_window('inference')
+                inf_energy = meas.total_energy
                 self.active_windows.remove('inference')
-                inf_energy = inf_meas.total_energy
             except Exception as e:
                 print(f"Error ending inference measurement: {e}")
-                if 'inference' in self.active_windows:
-                    self.active_windows.remove('inference')
+                self.active_windows.discard('inference')
 
-        end_time = time.time()
-        elapsed_time = end_time - start_time
+        elapsed = time.time() - start_time
+        total_energy = tok_energy + inf_energy
+        tokens_count = input_ids.numel()
 
-        # Calculate total energy and token count
-        total_e = inf_energy + tok_energy
-        tokens_count = input_ids.shape[0] * input_ids.shape[1]  # batch_size * seq_len
-
-        # Component energy breakdown
-        if self.zeus is not None:
-            component_energy = {k: np.sum(v) for k, v in self.comp_energy.items()}
-        else:
-            component_energy = {k: 0 for k in self.comp_energy.keys()}
-
+        components = {k: np.sum(v) for k, v in self.comp_energy.items()}
         return outputs.logits, {
-            'total_energy': total_e,
+            'total_energy': total_energy,
             'tokenization_energy': tok_energy,
             'inference_energy': inf_energy,
-            'energy_per_token': total_e / tokens_count if total_e > 0 and tokens_count > 0 else 0,
-            'time': elapsed_time,
-            'components': component_energy,
+            'energy_per_token': total_energy / tokens_count if tokens_count else 0,
+            'time': elapsed,
+            'components': components,
             'num_tokens': tokens_count
         }
 
     def measure_batch(self, input_ids, attention_mask=None):
-        """Batch Measurement for Classification Tasks"""
-        # Clear component energy tracking
+        """Measure energy for classification batch."""
         for v in self.comp_energy.values():
             v.clear()
+        if self.zeus:
+            for w in list(self.active_windows):
+                try: self.zeus.end_window(w)
+                except: pass
+                self.active_windows.discard(w)
 
-        # Ensure no active windows before starting
-        if self.zeus is not None:
-            for window in list(self.active_windows):
-                print(f"Warning: Closing stale measurement window '{window}'")
-                try:
-                    self.zeus.end_window(window)
-                except:
-                    pass
-                self.active_windows.remove(window)
-
-        # Start measurement
         start_time = time.time()
+        dtype = torch.float16 if self.precision_mode=='float16' else torch.float32
 
-        # Set precision mode
-        dtype = torch.float16 if self.precision_mode == 'float16' else torch.float32
-
-        # Measure inference
         total_e = 0
-        if self.zeus is not None:
+        if self.zeus:
             try:
                 self.zeus.begin_window('inference')
                 self.active_windows.add('inference')
@@ -335,104 +249,65 @@ class EnergyTracker:
             with torch.no_grad(), torch.amp.autocast(device_type="cuda", dtype=dtype):
                 out = self.model(input_ids, attention_mask=attention_mask)
         except Exception as e:
-            print(f"Error during model inference: {e}")
-            # Make sure to end measurement window even if inference fails
-            if self.zeus is not None and 'inference' in self.active_windows:
-                try:
-                    self.zeus.end_window('inference')
-                except:
-                    pass
-                self.active_windows.remove('inference')
+            if self.zeus and 'inference' in self.active_windows:
+                try: self.zeus.end_window('inference')
+                except: pass
+                self.active_windows.discard('inference')
             raise e
 
-        if self.zeus is not None and 'inference' in self.active_windows:
+        if self.zeus and 'inference' in self.active_windows:
             try:
                 meas = self.zeus.end_window('inference')
-                self.active_windows.remove('inference')
                 total_e = meas.total_energy
+                self.active_windows.remove('inference')
             except Exception as e:
                 print(f"Error ending inference measurement: {e}")
-                if 'inference' in self.active_windows:
-                    self.active_windows.remove('inference')
+                self.active_windows.discard('inference')
 
-        end_time = time.time()
-        elapsed_time = end_time - start_time
-
-        tokens = input_ids.numel()  # batch_size * seq_len
-
-        # Component energy breakdown
-        if self.zeus is not None:
-            component_energy = {k: np.sum(v) for k, v in self.comp_energy.items()}
-        else:
-            component_energy = {k: 0 for k in self.comp_energy.keys()}
-
+        elapsed = time.time() - start_time
+        tokens = input_ids.numel()
+        components = {k: np.sum(v) for k, v in self.comp_energy.items()}
         return out.logits, {
             'total_energy': total_e,
-            'energy_per_token': total_e / tokens if total_e > 0 and tokens > 0 else 0,
-            'time': elapsed_time,
-            'components': component_energy,
+            'energy_per_token': total_e / tokens if tokens else 0,
+            'time': elapsed,
+            'components': components,
             'num_tokens': tokens
         }
-    
+
 def get_carbon_intensity():
     """
     Get carbon intensity at current location (gCO2eq/kWh)
     """
     try:
-        # Try to get location data
         g = geocoder.ip('me')
         if g.latlng is None:
             print("Could not determine your location. Using global average carbon intensity.")
-            return 475  # Global average estimate
-
+            return 475
         lat, lon = g.latlng
         print(f"Location detected: {g.city}, {g.country} (lat: {lat}, lon: {lon})")
-
-        # For demo purposes, return an estimated value
         print("Using estimated carbon intensity.")
-
-        # Use country-specific values if available
         country_code = g.country
-        country_estimates = {
-            "US": 417,  # United States average
-            "CN": 620,  # China average
-            "IN": 708,  # India average
-            "GB": 231,  # United Kingdom average
-            "DE": 350,  # Germany average
-            "FR": 70,   # France (mostly nuclear)
-            "CA": 150,  # Canada (hydro heavy)
-            "AU": 520,  # Australia (coal heavy)
-            "JP": 462,  # Japan average
-            "BR": 110,  # Brazil (hydro heavy)
+        estimates = {
+            "US": 417, "CN": 620, "IN": 708, "GB": 231,
+            "DE": 350, "FR": 70,  "CA": 150, "AU": 520,
+            "JP": 462, "BR": 110
         }
-
-        if country_code in country_estimates:
-            intensity = country_estimates[country_code]
-            print(f"Using estimated carbon intensity for {country_code}: {intensity} gCO2eq/kWh")
-            return intensity
-        else:
-            print(f"No specific estimate for {country_code}. Using global average: 475 gCO2eq/kWh")
-            return 475  # Global average estimate
-
+        if country_code in estimates:
+            val = estimates[country_code]
+            print(f"Using estimate for {country_code}: {val} gCO2eq/kWh")
+            return val
+        print(f"No specific estimate for {country_code}. Using global average: 475 gCO2eq/kWh")
+        return 475
     except Exception as e:
-        print(f"Error getting carbon intensity: {str(e)}")
-        print("Using global average carbon intensity: 475 gCO2eq/kWh")
-        return 475  # Global average estimate as fallback
+        print(f"Error getting carbon intensity: {e}")
+        print("Using global average: 475 gCO2eq/kWh")
+        return 475
 
 def joules_to_co2(joules, intensity=None):
     """
-    Convert energy in joules to CO2 equivalent emissions in grams
-
-    Args:
-        joules: Energy in joules
-        intensity: Carbon intensity in gCO2eq/kWh (if None, will be fetched)
-
-    Returns:
-        CO2 emissions in grams
+    Convert joules to grams CO2 equivalent.
     """
     if intensity is None:
         intensity = get_carbon_intensity()
-
-    # J -> kWh: joules/3600, * intensity (gCO2eq/kWh)
-    emissions = joules/3600 * intensity
-    return emissions
+    return joules / 3600 * intensity

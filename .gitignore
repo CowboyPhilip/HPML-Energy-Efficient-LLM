@@ -37,6 +37,9 @@ ENV/
 ~$*.ipynb
 *.nbconvert.ipynb
 
+*.ipynb text eol=lf
+
+
 # ------------------------------
 # VS Code settings
 # ------------------------------

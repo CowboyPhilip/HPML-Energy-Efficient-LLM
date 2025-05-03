@@ -11,7 +11,7 @@ from datetime import datetime
 import torch
 from utils.memory_utils import clean_memory, print_gpu_memory
 from patched_energy_utils import PatchedEnergyTracker as EnergyTracker, get_carbon_intensity, joules_to_co2
-from utils.test_mmlu import test_quantized_models_on_mmlu, quick_test_mmlu
+from basework.basetest.test_mmlu import test_quantized_models_on_mmlu, quick_test_mmlu
 import ctypes
 import pynvml
 
