@@ -266,6 +266,8 @@ def test_generation_MBPP(model_name, quantization_modes=['fp16'], num_examples =
                 else:
                     print("unknown deepseek version, use original MBPP text, may lead to low code generation acc")
                     prompt = example['text']
+
+                # prompt = "who are ShakeSpeare?"
                 ground_truth_code = example['code']
                 test_cases = example['test_list']
                 

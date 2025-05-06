@@ -14,7 +14,7 @@ def apply_flash_attention(model):
         import torch
         model.cuda()  # Ensure weights on GPU for kernel fusion
         replace_attn_with_flash_attn(model, attn_impl="flash", replace_all=True)
-        print("Flash-Attention 3 enabled.")
+        print("Flash-Attention 2 enabled.")
     except ImportError as e:
         raise RuntimeError(
             "flash-attn not installed. Run: pip install flash-attn==3.0.0 triton==3.2.0"
