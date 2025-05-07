@@ -8,6 +8,8 @@ Supports tasks: generation, math, mbpp, mmlu, glue.
 import json
 import argparse
 from pathlib import Path
+import wandb
+
 
 # bench functions
 from utils.test_generation import (
@@ -22,7 +24,7 @@ from utils.test_mmlu import (
 )
 from utils.test_glue import test_quantized_models_on_glue
 from utils.energy_utils import get_carbon_intensity, joules_to_co2
-from adaptive_quant import AdaptiveQuantGenerator
+from utils.adaptive_quant import AdaptiveQuantGenerator
 
 
 def run_generation(args):
@@ -36,7 +38,8 @@ def run_generation(args):
         agent = AdaptiveQuantGenerator(
             args.model,
             high_mode=args.high_mode,
-            low_mode=args.low_mode
+            low_mode=args.low_mode,
+            device_map=args.device_map    # pass through
         )
         # generate will log energy & latency internally
         _ = agent.generate(args.prompt, max_new_tokens=args.tokens)
@@ -52,7 +55,8 @@ def run_generation(args):
                 model_name=args.model,
                 quant_mode=mode,
                 prompt=args.prompt,
-                max_new_tokens=args.tokens
+                max_new_tokens=args.tokens,
+                device_map=args.device_map    # pass through
             )
             results[mode] = stats
         else:
@@ -62,7 +66,8 @@ def run_generation(args):
                 prompt=args.prompt,
                 quantization_modes=modes,
                 max_new_tokens=args.tokens,
-                verbose=args.verbose
+                verbose=args.verbose,
+                device_map=args.device_map    # pass through
             )
             results.update(stats)
 
@@ -79,7 +84,8 @@ def run_math(args):
         dataset_config=args.dataset_config,
         split=args.split,
         num_examples=args.num_examples,
-        verbose=args.verbose
+        verbose=args.verbose,
+        device_map=args.device_map    # pass through
     )
     return {"math": stats}
 
@@ -91,7 +97,8 @@ def run_mbpp(args):
         model_name=args.model,
         quantization_modes=args.modes,
         num_examples=args.num_examples,
-        verbose=args.verbose
+        verbose=args.verbose,
+        device_map=args.device_map    # pass through
     )
     return {"mbpp": stats}
 
@@ -104,13 +111,15 @@ def run_mmlu(args):
             model_name=args.model,
             quant_mode=args.modes[0],
             subjects=args.subjects,
-            max_samples=args.max_samples
+            max_samples=args.max_samples,
+            device_map=args.device_map    # pass through
         )
     else:
         stats = test_quantized_models_on_mmlu(
             model_name=args.model,
             quantization_modes=args.modes,
-            subjects=args.subjects
+            subjects=args.subjects,
+            device_map=args.device_map    # pass through
         )
     return {"mmlu": stats}
 
@@ -122,7 +131,8 @@ def run_glue(args):
         model_name=args.model,
         tasks=args.glue_tasks,
         quantization_modes=args.modes,
-        batch_size=args.batch_size
+        batch_size=args.batch_size,
+        device_map=args.device_map    # pass through
     )
     return {"glue": stats}
 
@@ -168,6 +178,11 @@ def main():
     parser.add_argument(
         "--modes", nargs="+", default=["int8_vanilla"],
         help="List of quant+kernel modes, e.g. fp16_flash int8_flash int4_paged adaptive"
+    )
+    parser.add_argument(
+        "--device_map", choices=["auto","cuda"],
+        default="auto",
+        help="Deployment mode: 'auto' for offload, 'cuda' for full GPU"
     )
     # adaptive endpoints
     parser.add_argument(
@@ -245,6 +260,15 @@ def main():
         modes.remove("adaptive")
     args.modes = modes
 
+    wandb.init(
+    project="HPML-Energy-Efficient-LLM",
+    name=f"{args.model}-{args.task}-{args.modes}",
+    tags=[args.model.split('/')[-1], args.task] + args.modes,
+    group=args.model.split('/')[-1],
+    job_type=args.task,
+    config=vars(args)
+)
+
     # dispatch
     if args.task == "generation":
         results = run_generation(args)
@@ -262,6 +286,9 @@ def main():
     Path(args.out).write_text(json.dumps(results, indent=2))
     print(f"\nSaved results to {args.out}")
 
+    wandb.log(results)
+    wandb.finish()
+    print(f"\nSaved results to wandb")
 
 if __name__ == "__main__":
     main()
