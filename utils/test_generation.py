@@ -221,7 +221,7 @@ def evaluate_generated_code(generated_code, test_cases):
         # If any error happens (syntax error, wrong output, etc.), the function is incorrect
         return False
     
-def test_generation_MBPP(model_name, quantization_modes=['fp16'], num_examples = 500, verbose=True, device_map: str = "auto"):
+def test_generation_MBPP(model_name, quantization_modes=['fp16'], num_examples = 500, verbose=True, device_map: str = "auto", temperature = None, top_p = None):
     """
     Test MBPP dataset with energy tracking and pass@1 accuracy, recording full stats.
     """
@@ -252,23 +252,26 @@ def test_generation_MBPP(model_name, quantization_modes=['fp16'], num_examples =
             for i, example in enumerate(tqdm(dataset, desc=f"Testing {mode.upper()}")):
                 if i >= num_examples:
                     break
-                # header_for_clean_output = "output only the code, no explanation: "
-                # if "Qwen" in model_name:
-                #     prompt = header_for_clean_output + example['text']
-                # elif "coder" in model_name:
-                #     # prompt = example['text']
-                #     prompt = header_for_clean_output + example['text']
-                #     # print(f"===== the prompt is {prompt} =====")
-                # else:
-                #     print("unknown deepseek version, use original MBPP text, may lead to low code generation acc")
-                #     prompt = example['text']
+                header_for_clean_output = "output only the code, no explanation: "
+                if "Qwen" in model_name:
+                    prompt = header_for_clean_output + example['text']
+                elif "coder" in model_name:
+                    # prompt = example['text']
+                    prompt = header_for_clean_output + example['text']
+                    # print(f"===== the prompt is {prompt} =====")
+                else:
+                    print("unknown deepseek version, use original MBPP text, may lead to low code generation acc")
+                    prompt = example['text']
 
-                prompt = "what is computer?"
+                # prompt = "what is computer?"
+                formatted_prompt = f"""
+                <｜begin▁of▁sentence｜><｜User｜>{prompt}<｜Assistant｜><think>
+                """
                 ground_truth_code = example['code']
                 test_cases = example['test_list']
 
                  # Tokenize uniformly
-                tokens = tokenizer(prompt, return_tensors='pt', truncation=True, max_length=512)
+                tokens = tokenizer(formatted_prompt, return_tensors='pt', truncation=True, max_length=512)
                 
                 try:
                     # Inference
@@ -284,12 +287,12 @@ def test_generation_MBPP(model_name, quantization_modes=['fp16'], num_examples =
 
                     
 
-                    logits, stats = tracker.measure_text(tokens.input_ids, tokenizer)
+                    logits, stats = tracker.measure_text(tokens.input_ids, tokenizer, temperature = temperature, top_p=top_p)
                 except torch.cuda.OutOfMemoryError:
                     # Retry with shorter input
                     print(f"OOM in {mode}, truncating input...")
-                    tokens = tokenizer(prompt, return_tensors='pt', truncation=True, max_length=256)
-                    logits, stats = tracker.measure_text(tokens.input_ids, tokenizer)
+                    tokens = tokenizer(formatted_prompt, return_tensors='pt', truncation=True, max_length=256)
+                    logits, stats = tracker.measure_text(tokens.input_ids, tokenizer, temperature, top_p)
                     
                 # Decode logits -> generated text
                 generated_tokens = torch.argmax(logits, dim=-1)
@@ -301,7 +304,7 @@ def test_generation_MBPP(model_name, quantization_modes=['fp16'], num_examples =
 
                 # Record full info
                 results[mode]["examples"].append({
-                    "prompt": prompt,
+                    "prompt": formatted_prompt,
                     "ground_truth_code": ground_truth_code,
                     "generated_code": generated_text,
                     "test_cases": test_cases,

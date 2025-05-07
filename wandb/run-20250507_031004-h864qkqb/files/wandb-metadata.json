@@ -1,0 +1,42 @@
+{
+  "os": "Linux-5.10.0-34-cloud-amd64-x86_64-with-glibc2.31",
+  "python": "CPython 3.9.22",
+  "startedAt": "2025-05-07T03:10:06.145294Z",
+  "program": "/home/fc2795/HPML-Energy-Efficient-LLM/experiments.ipynb",
+  "codePath": "experiments.ipynb",
+  "git": {
+    "remote": "https://github.com/CowboyPhilip/HPML-Energy-Efficient-LLM",
+    "commit": "f8faa25708a2323f7de612cff8340fbb9aea96aa"
+  },
+  "email": "fc2795@columbia.edu",
+  "root": "/home/fc2795/HPML-Energy-Efficient-LLM",
+  "host": "instance-20250409-180757",
+  "executable": "/opt/conda/envs/vLLM/bin/python",
+  "codePathLocal": "experiments.ipynb",
+  "cpu_count": 1,
+  "cpu_count_logical": 2,
+  "gpu": "Tesla T4",
+  "gpu_count": 1,
+  "disk": {
+    "/": {
+      "total": "105427566592",
+      "used": "60414701568"
+    }
+  },
+  "memory": {
+    "total": "7814709248"
+  },
+  "cpu": {
+    "count": 1,
+    "countLogical": 2
+  },
+  "gpu_nvidia": [
+    {
+      "name": "Tesla T4",
+      "memoryTotal": "16106127360",
+      "cudaCores": 2560,
+      "architecture": "Turing"
+    }
+  ],
+  "cudaVersion": "12.4"
+}

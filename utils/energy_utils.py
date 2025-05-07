@@ -133,7 +133,7 @@ class EnergyTracker:
             print(f"Error in end_window for {name}: {e}")
             self.active_windows.discard(name)
 
-    def measure_text(self, text, tokenizer):
+    def measure_text(self, text, tokenizer, temperature, top_p):
         """Measure energy for a generation prompt."""
         # clear prior data
         for v in self.comp_energy.values():
@@ -192,7 +192,7 @@ class EnergyTracker:
 
         try:
             with torch.no_grad(), torch.amp.autocast(device_type="cuda", dtype=dtype):
-                outputs = self.model(input_ids, attention_mask=attention_mask)
+                outputs = self.model(input_ids, attention_mask=attention_mask,  temperature=temperature, top_p= top_p)
         except Exception as e:
             if self.zeus and 'inference' in self.active_windows:
                 try: self.zeus.end_window('inference')
