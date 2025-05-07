@@ -256,32 +256,34 @@ def test_generation_MBPP(model_name, quantization_modes=['fp16'], num_examples =
             for i, example in enumerate(tqdm(dataset, desc=f"Testing {mode.upper()}")):
                 if i >= num_examples:
                     break
-                header_for_clean_output = "output only the code, no explanation: "
-                if "Qwen" in model_name:
-                    prompt = header_for_clean_output + example['text']
-                elif "coder" in model_name:
-                    # prompt = example['text']
-                    prompt = header_for_clean_output + example['text']
-                    # print(f"===== the prompt is {prompt} =====")
-                else:
-                    print("unknown deepseek version, use original MBPP text, may lead to low code generation acc")
-                    prompt = example['text']
+                # header_for_clean_output = "output only the code, no explanation: "
+                # if "Qwen" in model_name:
+                #     prompt = header_for_clean_output + example['text']
+                # elif "coder" in model_name:
+                #     # prompt = example['text']
+                #     prompt = header_for_clean_output + example['text']
+                #     # print(f"===== the prompt is {prompt} =====")
+                # else:
+                #     print("unknown deepseek version, use original MBPP text, may lead to low code generation acc")
+                #     prompt = example['text']
 
-                # prompt = "who are ShakeSpeare?"
+                prompt = "what is computer?"
                 ground_truth_code = example['code']
                 test_cases = example['test_list']
                 
                 try:
                     # Inference
-                    if mode == 'fp16':
-                        tokens = tokenizer(prompt, return_tensors='pt', truncation=True, max_length=512)
-                        logits, stats = tracker.measure_text(tokens.input_ids, tokenizer)
-                    else:
-                        logits, stats = tracker.measure_text(prompt, tokenizer)
+                    # if mode == 'fp16':
+                    #     tokens = tokenizer(prompt, return_tensors='pt', truncation=True, max_length=512)
+                    #     logits, stats = tracker.measure_text(tokens.input_ids, tokenizer)
+                    # else:
+                    #     logits, stats = tracker.measure_text(prompt, tokenizer)
 
-                    # Decode logits -> generated text
-                    generated_tokens = torch.argmax(logits, dim=-1)
-                    generated_text = tokenizer.batch_decode(generated_tokens, skip_special_tokens=True)[0]
+                    # # Decode logits -> generated text
+                    # generated_tokens = torch.argmax(logits, dim=-1)
+                    # generated_text = tokenizer.batch_decode(generated_tokens, skip_special_tokens=True)[0]
+
+                    
 
                 except torch.cuda.OutOfMemoryError:
                     print(f"OOM in {mode}, truncating input...")
