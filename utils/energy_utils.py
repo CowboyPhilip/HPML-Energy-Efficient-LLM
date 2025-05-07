@@ -134,7 +134,7 @@ class EnergyTracker:
             self.active_windows.discard(name)
 
     def measure_text(self, text, tokenizer, temperature, top_p):
-        """Measure energy for a generation prompt."""
+        """Measure energy for a classification prompt."""
         # clear prior data
         for v in self.comp_energy.values():
             v.clear()
@@ -159,7 +159,7 @@ class EnergyTracker:
 
         if isinstance(text, str):
             tokens = tokenizer(text, return_tensors='pt',
-                               padding=True, truncation=True, max_length=64)
+                               padding=True, truncation=True, max_length=256)
         else:
             tokens = {"input_ids": text}
 
@@ -192,7 +192,7 @@ class EnergyTracker:
 
         try:
             with torch.no_grad(), torch.amp.autocast(device_type="cuda", dtype=dtype):
-                outputs = self.model(input_ids, attention_mask=attention_mask,  temperature=temperature, top_p= top_p)
+                outputs = self.model(input_ids, attention_mask=attention_mask,  temperature=temperature, top_p= top_p, do_sample=(temperature > 0))
         except Exception as e:
             if self.zeus and 'inference' in self.active_windows:
                 try: self.zeus.end_window('inference')
@@ -215,6 +215,109 @@ class EnergyTracker:
 
         components = {k: np.sum(v) for k, v in self.comp_energy.items()}
         return outputs.logits, {
+            'total_energy': total_energy,
+            'tokenization_energy': tok_energy,
+            'inference_energy': inf_energy,
+            'energy_per_token': total_energy / tokens_count if tokens_count else 0,
+            'time': elapsed,
+            'components': components,
+            'num_tokens': tokens_count
+        }
+    
+    def measure_generation(self, text, tokenizer, temperature, top_p):
+        """Measure energy for a generation prompt using model.generate()."""
+        # clear prior data
+        for v in self.comp_energy.values():
+            v.clear()
+        if self.zeus:
+            for w in list(self.active_windows):
+                try:
+                    self.zeus.end_window(w)
+                except:
+                    pass
+                self.active_windows.discard(w)
+
+        start_time = time.time()
+
+        # tokenization measurement
+        tok_energy = 0
+        if self.zeus:
+            try:
+                self.zeus.begin_window('tokenization')
+                self.active_windows.add('tokenization')
+            except Exception as e:
+                print(f"Error starting tokenization measurement: {e}")
+
+        if isinstance(text, str):
+            tokens = tokenizer(text, return_tensors='pt', padding=True, truncation=True, max_length=256)
+        elif isinstance(text, dict):
+            tokens = text    # have two element, input_ids and attention_mask
+        elif isinstance(text, torch.Tensor):  # assuming this is input_ids
+            tokens = {"input_ids": text}
+        else:
+            raise ValueError("Unsupported input type for `text`")
+
+        if self.zeus and 'tokenization' in self.active_windows:
+            try:
+                tok_meas = self.zeus.end_window('tokenization')
+                tok_energy = tok_meas.total_energy
+                self.active_windows.remove('tokenization')
+            except Exception as e:
+                print(f"Error ending tokenization measurement: {e}")
+                self.active_windows.discard('tokenization')
+
+        # prepare input
+        input_ids = tokens["input_ids"].to('cuda')
+        attention_mask = tokens.get("attention_mask")
+        if attention_mask is not None:
+            attention_mask = attention_mask.to('cuda')
+
+        # set dtype
+        dtype = torch.float16 if self.precision_mode == 'float16' else torch.float32
+
+        # inference measurement
+        inf_energy = 0
+        generated_ids = None
+        if self.zeus:
+            try:
+                self.zeus.begin_window('inference')
+                self.active_windows.add('inference')
+            except Exception as e:
+                print(f"Error starting inference measurement: {e}")
+
+        try:
+            with torch.no_grad(), torch.amp.autocast(device_type="cuda", dtype=dtype):
+                generated_ids = self.model.generate(
+                    input_ids=input_ids,
+                    attention_mask=attention_mask,
+                    temperature=temperature,
+                    top_p=top_p,
+                    do_sample=(temperature > 0),
+                    max_new_tokens=512,
+                    pad_token_id=tokenizer.eos_token_id
+                )
+        except Exception as e:
+            if self.zeus and 'inference' in self.active_windows:
+                try: self.zeus.end_window('inference')
+                except: pass
+                self.active_windows.discard('inference')
+            raise e
+
+        if self.zeus and 'inference' in self.active_windows:
+            try:
+                meas = self.zeus.end_window('inference')
+                inf_energy = meas.total_energy
+                self.active_windows.remove('inference')
+            except Exception as e:
+                print(f"Error ending inference measurement: {e}")
+                self.active_windows.discard('inference')
+
+        elapsed = time.time() - start_time
+        total_energy = tok_energy + inf_energy
+        tokens_count = generated_ids.numel()
+
+        components = {k: np.sum(v) for k, v in self.comp_energy.items()}
+        return generated_ids, {
             'total_energy': total_energy,
             'tokenization_energy': tok_energy,
             'inference_energy': inf_energy,

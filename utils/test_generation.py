@@ -13,6 +13,35 @@ from datasets import load_dataset
 from tqdm import tqdm
 import wandb
 from utils.adaptive_quant import AdaptiveQuantGenerator
+import re
+import ast
+
+def extract_clean_function_code_from_output(text):
+    """
+    从模型输出中提取 [BEGIN]<｜Assistant｜><think> 和 [END]<｜Assistant｜><think> 之间的代码，
+    然后仅提取有效的函数定义（忽略 print、assert 等）。
+    
+    Args:
+        text (str): 包含模型输出的字符串
+        
+    Returns:
+        str or None: 清洗后的函数定义代码，若未找到则返回 None
+    """
+    # 提取代码块
+    pattern = r"\[BEGIN\]<｜Assistant｜><think>\n(.*?)\n\[END\]<｜Assistant｜><think>"
+    match = re.search(pattern, text, re.DOTALL)
+    if not match:
+        return None
+    code_block = match.group(1).strip()
+    
+    # 提取函数定义
+    try:
+        tree = ast.parse(code_block)
+        func_defs = [node for node in tree.body if isinstance(node, ast.FunctionDef)]
+        return "\n\n".join([ast.unparse(func) for func in func_defs])
+    except Exception:
+        return None
+
 
 def compare_generation_energy(model_name, prompt, quantization_modes=['fp32'], verbose=True, device_map: str = "auto"):
     """
@@ -275,9 +304,18 @@ def test_generation_MBPP(
 
                 for ex in tqdm(ds, desc="MBPP ADAPTIVE"):
                     # prepare prompt
-                    hdr = "output only the code, no explanation: "
+                    # hdr = "output only the code, no explanation: "
                     prompt_body = ex['text']
-                    prompt = f"<｜begin▁of▁sentence｜><｜User｜>{hdr}{prompt_body}<｜Assistant｜><think>"
+                    # prompt = f"<｜begin▁of▁sentence｜><｜User｜>{hdr}{prompt_body}<｜Assistant｜><think>"
+                    prompt= f"""
+                    # Instruction: {prompt_body}
+                    # Function Signature:
+                    def function_name(arguments):
+                        '''
+                        {prompt_body}
+                        '''
+                        # Let's think step by step:
+                    """
                     # record input length
                     input_ids = tokenizer(prompt, return_tensors='pt', truncation=True, max_length=512).input_ids.to(agent.high_model.device)
                     input_len = input_ids.size(1)
@@ -339,31 +377,59 @@ def test_generation_MBPP(
 
             for ex in tqdm(ds, desc=f"MBPP {mode.upper()}"):
                 # prompt
-                hdr = "output only the code, no explanation: "
-                prompt_body = ex['text']
-                prompt = f"<｜begin▁of▁sentence｜><｜User｜>{hdr}{prompt_body}<｜Assistant｜><think>"
+                # hdr = "output only the code, no explanation: "
+                task = ex['text']
+                test = "\n".join(ex['test_list'])
+                prompt_body = f"You are an expert Python programmer, and here is your task: {task} You should only generate code and your code should pass these tests:\n\n{test}\n[BEGIN]"
+                prompt = f"<｜begin▁of▁sentence｜><｜User｜>{prompt_body}<｜Assistant｜><think>"
+                tokenized_prompt = tokenizer(prompt, return_tensors='pt',
+                            padding=True, truncation=True, max_length=256)
+                input_len = tokenized_prompt.input_ids.shape[1]
+                # prompt= f"""
+                # # Instruction: {prompt_body}
+                # # Function Signature:
+                # def function_name(arguments):
+                #     '''
+                #     {prompt_body}
+                #     '''
+                #     # Let's think step by step:
+                # """
+                # prompt = (
+                # f"You are an expert Python programmer, and here is your task: {task}. "
+                # f"Your code should pass these tests: \n\n{test}\n"
+                # f"Code should be written in a markdown codeblock and NO explanation is required. Talk is easy, show me the code!"
+                # )   
                 # tokenize
-                tokens = tokenizer(prompt, return_tensors='pt', truncation=True, max_length=512)
+                # tokens = tokenizer(prompt, return_tensors='pt', truncation=True, max_length=512)
 
                 # inference
                 try:
-                    logits, stats = tracker.measure_text(tokens.input_ids.to(model.device), tokenizer, temperature, top_p)
+                    # logits, stats = tracker.measure_text(tokens.input_ids.to(model.device), tokenizer, temperature, top_p)
+                    print("===1===")
+                    gen_ids, stats = tracker.measure_generation(prompt, tokenizer, temperature, top_p)
                 except torch.cuda.OutOfMemoryError:
-                    tokens = tokenizer(prompt, return_tensors='pt', truncation=True, max_length=256)
-                    logits, stats = tracker.measure_text(tokens.input_ids.to(model.device), tokenizer, temperature, top_p)
+                    # 需要截断prompt 以节省memory
+                    print("===2===")
+                    # tokens = tokenizer(prompt, return_tensors='pt', truncation=True, max_length=256)
+                    # logits, stats = tracker.measure_text(tokens.input_ids.to(model.device), tokenizer, temperature, top_p)
+                    # tokens = tokenizer(prompt, return_tensors='pt', truncation=True, max_length=256)
+                    gen_ids, stats = tracker.measure_generation(tokenized_prompt.input_ids.to(model.device), tokenizer, temperature, top_p)
 
                 # decode
-                gen_tokens = torch.argmax(logits, dim=-1)
-                pred_code = tokenizer.batch_decode(gen_tokens, skip_special_tokens=True)[0]
+                # gen_tokens = torch.argmax(logits, dim=-1)
+                print("===3===")
+                # pred_code = tokenizer.decode(gen_ids[0][input_len:], skip_special_tokens=True)
+                gen_text = tokenizer.decode(gen_ids[0], skip_special_tokens=True)
+                gen_code = extract_clean_function_code_from_output(gen_text)
                 # eval
-                is_corr = evaluate_generated_code(pred_code, ex['test_list'])
+                is_corr = evaluate_generated_code(gen_code, ex['test_list'])
                 correct += int(is_corr)
                 total_tokens += stats.get('num_tokens', 1)
 
                 examples.append({
                     'prompt': prompt,
                     'ground_truth_code': ex['code'],
-                    'generated_code': pred_code,
+                    'generated_code': gen_code,
                     'test_list': ex['test_list'],
                     'is_correct': is_corr,
                     'stats': stats
