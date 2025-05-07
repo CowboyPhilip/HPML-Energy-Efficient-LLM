@@ -389,6 +389,8 @@ def test_generation_MBPP(
                 'accuracy': accuracy,
                 'carbon_emissions': carbon
             }
+            if verbose:
+                print(f"{mode.upper()} SUMMARY: Samples={count}, Acc={accuracy:.2f}%,")
 
         except Exception as e:
             print(f"Error testing {mode} mode: {e}")
