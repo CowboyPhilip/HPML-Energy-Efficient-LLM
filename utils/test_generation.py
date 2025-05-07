@@ -380,45 +380,24 @@ def test_generation_MBPP(
                 # hdr = "output only the code, no explanation: "
                 task = ex['text']
                 test = "\n".join(ex['test_list'])
-                prompt_body = f"You are an expert Python programmer, and here is your task: {task} You should only generate code and your code should pass these tests:\n\n{test}\n[BEGIN]"
+                prompt_body = f"You are an expert Python programmer, and here is your task: {task} Your code should pass these tests:\n\n{test}\n[BEGIN]"
                 prompt = f"<｜begin▁of▁sentence｜><｜User｜>{prompt_body}<｜Assistant｜><think>"
-                tokenized_prompt = tokenizer(prompt, return_tensors='pt',
-                            padding=True, truncation=True, max_length=256)
-                input_len = tokenized_prompt.input_ids.shape[1]
-                # prompt= f"""
-                # # Instruction: {prompt_body}
-                # # Function Signature:
-                # def function_name(arguments):
-                #     '''
-                #     {prompt_body}
-                #     '''
-                #     # Let's think step by step:
-                # """
-                # prompt = (
-                # f"You are an expert Python programmer, and here is your task: {task}. "
-                # f"Your code should pass these tests: \n\n{test}\n"
-                # f"Code should be written in a markdown codeblock and NO explanation is required. Talk is easy, show me the code!"
-                # )   
-                # tokenize
-                # tokens = tokenizer(prompt, return_tensors='pt', truncation=True, max_length=512)
-
+                # tokenized_prompt = tokenizer(prompt, return_tensors='pt',
+                #             padding=True, truncation=True, max_length=256)
                 # inference
                 try:
                     # logits, stats = tracker.measure_text(tokens.input_ids.to(model.device), tokenizer, temperature, top_p)
                     print("===1===")
                     gen_ids, stats = tracker.measure_generation(prompt, tokenizer, temperature, top_p)
                 except torch.cuda.OutOfMemoryError:
-                    # 需要截断prompt 以节省memory
+                    # 如果mem不足 需要截断prompt 以节省memory
                     print("===2===")
-                    # tokens = tokenizer(prompt, return_tensors='pt', truncation=True, max_length=256)
-                    # logits, stats = tracker.measure_text(tokens.input_ids.to(model.device), tokenizer, temperature, top_p)
-                    # tokens = tokenizer(prompt, return_tensors='pt', truncation=True, max_length=256)
+                    tokenized_prompt = tokenizer(prompt, return_tensors='pt',
+                            padding=True, truncation=True, max_length=128)
                     gen_ids, stats = tracker.measure_generation(tokenized_prompt.input_ids.to(model.device), tokenizer, temperature, top_p)
 
                 # decode
-                # gen_tokens = torch.argmax(logits, dim=-1)
                 print("===3===")
-                # pred_code = tokenizer.decode(gen_ids[0][input_len:], skip_special_tokens=True)
                 gen_text = tokenizer.decode(gen_ids[0], skip_special_tokens=True)
                 gen_code = extract_clean_function_code_from_output(gen_text)
                 # eval
