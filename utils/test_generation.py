@@ -7,12 +7,13 @@ from transformers import (
     DataCollatorWithPadding
 )
 import torch
-from utils.load_llm import load_llm, load_classifier
+from utils.load_llm import load_llm, _parse_mode
 from utils.memory_utils import clean_memory, print_gpu_memory
 from datasets import load_dataset
 from tqdm import tqdm
+import wandb
 
-def compare_generation_energy(model_name, prompt, quantization_modes=['fp16'], verbose=True):
+def compare_generation_energy(model_name, prompt, quantization_modes=['fp32'], verbose=True, device_map: str = "auto"):
     """
     Compare energy consumption of different quantization methods for text generation
 
@@ -43,30 +44,16 @@ def compare_generation_energy(model_name, prompt, quantization_modes=['fp16'], v
             clean_memory()
 
             # Load model with specific quantization
-            model = load_llm(model_name, mode=mode)
+            model = load_llm(model_name, mode=mode, device_map=device_map)
 
-            # Create energy tracker
-            precision = 'float16' if mode == 'fp16' else None
-            tracker = EnergyTracker(model, precision_mode=precision)
+             # Parse mode to extract precision ('fp32','fp16','int8','int4')
+            q_mode, _ = _parse_mode(mode)
+            tracker = EnergyTracker(model, precision_mode=q_mode)
 
-            # Measure energy with safety measures
-            print(f"Running inference...")
-            try:
-                # Start with smaller prompt length for safety
-                if mode == 'fp16':
-                    # For FP16, use very small input to save memory
-                    print("Using truncated prompt for FP16 mode to save memory")
-                    tokens = tokenizer(prompt, return_tensors='pt', truncation=True, max_length=32)
-                    _, stats = tracker.measure_text(tokens.input_ids, tokenizer)
-                else:
-                    # For INT8 and INT4, we can use the full prompt
-                    _, stats = tracker.measure_text(prompt, tokenizer)
-
-            except torch.cuda.OutOfMemoryError:
-                print(f"Out of memory error with {mode} mode. Trying with smaller input...")
-                # Tokenize and truncate prompt
-                tokens = tokenizer(prompt, return_tensors='pt', truncation=True, max_length=32)
-                _, stats = tracker.measure_text(tokens.input_ids, tokenizer)
+            # Tokenize once for all modes
+            tokens = tokenizer(prompt, return_tensors='pt', truncation=True, max_length=512)
+            print("Running inference...")
+            _, stats = tracker.measure_text(tokens.input_ids, tokenizer)
 
             # Calculate carbon footprint
             carbon_emissions = joules_to_co2(stats['total_energy'], carbon_intensity)
@@ -74,6 +61,17 @@ def compare_generation_energy(model_name, prompt, quantization_modes=['fp16'], v
 
             # Save results
             results[mode] = stats
+
+            # W&B: log per-mode metrics
+            wandb.log({
+                'mode': mode,
+                'total_energy_J': stats['total_energy'],
+                'energy_per_token_J': stats.get('energy_per_token', 0),
+                'inference_time_s': stats.get('time', 0),
+                'carbon_g': stats['carbon_emissions'],
+                'energy_efficiency': stats.get('accuracy', 0) / stats['total_energy'],
+                'energy_savings_percent': stats.get('energy_savings', 0)
+            })
 
             # Print results
             if verbose:
@@ -99,69 +97,66 @@ def compare_generation_energy(model_name, prompt, quantization_modes=['fp16'], v
             print(f"Error testing {mode} mode: {e}")
             results[mode] = {"error": str(e)}
 
-    # Compare efficiency if we have results for FP16
-    if 'fp16' in results and 'total_energy' in results['fp16']:
-        baseline = results['fp16']['total_energy']
-        print("\n===== Efficiency Comparison =====")
-        for mode in ['int8', 'int4']:
-            if mode in results and 'total_energy' in results[mode]:
-                savings = 100 * (baseline - results[mode]['total_energy']) / baseline
-                results[mode]['energy_savings'] = savings
-                print(f"{mode.upper()} saves {savings:.2f}% energy compared to FP16")
-    elif len(quantization_modes) > 1:
-        # If no FP16, compare to highest energy mode
-        highest_energy_mode = max(
-            [m for m in quantization_modes if m in results and 'total_energy' in results[m]],
-            key=lambda m: results[m]['total_energy']
-        )
-        baseline = results[highest_energy_mode]['total_energy']
-        print(f"\n===== Efficiency Comparison (against {highest_energy_mode.upper()}) =====")
+    # Compare efficiency if we have results for FP32
+    if 'fp32' in results and 'total_energy' in results['fp32']:
+        baseline_mode = 'fp32'
+    elif 'fp16' in results and 'total_energy' in results['fp16']:
+        baseline_mode = 'fp16'
+    else:
+        # pick the mode with highest total_energy
+        valid = [m for m in quantization_modes if m in results and 'total_energy' in results[m]]
+        baseline_mode = max(valid, key=lambda m: results[m]['total_energy']) if valid else None
+
+    if baseline_mode:
+        baseline_energy = results[baseline_mode]['total_energy']
+        print(f"\n===== Efficiency Comparison (baseline: {baseline_mode.upper()}) =====")
         for mode in quantization_modes:
-            if mode != highest_energy_mode and mode in results and 'total_energy' in results[mode]:
-                savings = 100 * (baseline - results[mode]['total_energy']) / baseline
+            if mode != baseline_mode and mode in results and 'total_energy' in results[mode]:
+                savings = 100 * (baseline_energy - results[mode]['total_energy']) / baseline_energy
                 results[mode]['energy_savings'] = savings
-                print(f"{mode.upper()} saves {savings:.2f}% energy compared to {highest_energy_mode.upper()}")
+                print(f"{mode.upper()} saves {savings:.2f}% energy compared to {baseline_mode.upper()}")
 
-    # Display summary table
+    # Summary table
     print("\n===== Summary Table =====")
-    headers = ["Mode", "Energy (J)", "Time (s)", "Energy/Token (J)", "CO2 (gCO2eq)"]
+    headers = ["Mode", "Energy (J)", "Time (s)", "Energy/Token (J)", "CO2 (gCO2eq)", "Savings (%)"]
     print(" | ".join(headers))
-    print("-" * 80)
-
+    print("-" * 90)
     for mode in quantization_modes:
         if mode in results and 'total_energy' in results[mode]:
             stats = results[mode]
-            values = [
+            save_pct = f"{stats.get('energy_savings', 0):.2f}"
+            row = [
                 mode.upper(),
                 f"{stats['total_energy']:.4f}",
                 f"{stats['time']:.3f}",
-                f"{stats['energy_per_token']:.6f}",
-                f"{stats.get('carbon_emissions', 0):.6f}"
+                f"{stats.get('energy_per_token',0):.6f}",
+                f"{stats.get('carbon_emissions',0):.6f}",
+                save_pct
             ]
-            print(" | ".join(values))
+            print(" | ".join(row))
 
     return results
 
 
-def quick_test_generation(model_name, quant_mode='fp16'):
+def quick_test_generation(model_name, quant_mode='fp16', device_map: str = "auto"):
     """Run a quick test for a single quantization mode on generation task"""
     print(f"Quick test for {model_name} with {quant_mode} quantization")
 
     # Load tokenizer
     tokenizer = AutoTokenizer.from_pretrained(model_name)
-
+    clean_memory()
     # Load model
-    model = load_llm(model_name, mode=quant_mode)
+    model = load_llm(model_name, mode=quant_mode, device_map=device_map)
 
-    # Create energy tracker
-    precision = 'float16' if quant_mode == 'fp16' else None
-    tracker = EnergyTracker(model, precision_mode=precision)
+    # Parse quantization mode
+    q_mode, _ = _parse_mode(quant_mode)
+    tracker = EnergyTracker(model, precision_mode=q_mode)
 
-    # Run inference
+    # Prepare and run inference on a fixed prompt
     prompt = "DeepSeek AI is an advanced open-source language model designed to power AI applications."
+    tokens = tokenizer(prompt, return_tensors='pt', truncation=True, max_length=128)
     print(f"Running inference with prompt: '{prompt}'")
-
-    _, stats = tracker.measure_text(prompt, tokenizer)
+    _, stats = tracker.measure_text(tokens.input_ids, tokenizer)
 
     # Calculate carbon footprint
     carbon_intensity = get_carbon_intensity()
@@ -226,7 +221,7 @@ def evaluate_generated_code(generated_code, test_cases):
         # If any error happens (syntax error, wrong output, etc.), the function is incorrect
         return False
     
-def test_generation_MBPP(model_name, quantization_modes=['fp16'], num_examples = 500, verbose=True):
+def test_generation_MBPP(model_name, quantization_modes=['fp16'], num_examples = 500, verbose=True, device_map: str = "auto"):
     """
     Test MBPP dataset with energy tracking and pass@1 accuracy, recording full stats.
     """
@@ -248,9 +243,10 @@ def test_generation_MBPP(model_name, quantization_modes=['fp16'], num_examples =
         
         try:
             clean_memory()
-            model = load_llm(model_name, mode=mode)
-            precision = 'float16' if mode == 'fp16' else None
-            tracker = EnergyTracker(model, precision_mode=precision)
+           # Load model and set precision mode for energy tracker
+            model = load_llm(model_name, mode=mode, device_map=device_map)
+            q_mode, _ = _parse_mode(mode)                          # Parse quantization
+            tracker = EnergyTracker(model, precision_mode=q_mode)  # Set correct precision
 
             # for example in tqdm(dataset, desc=f"Testing {mode.upper()}"):
             for i, example in enumerate(tqdm(dataset, desc=f"Testing {mode.upper()}")):
@@ -270,28 +266,26 @@ def test_generation_MBPP(model_name, quantization_modes=['fp16'], num_examples =
                 # prompt = "who are ShakeSpeare?"
                 ground_truth_code = example['code']
                 test_cases = example['test_list']
+
+                 # Tokenize uniformly
+                tokens = tokenizer(prompt, return_tensors='pt', truncation=True, max_length=512)
                 
                 try:
                     # Inference
-                    if mode == 'fp16':
-                        tokens = tokenizer(prompt, return_tensors='pt', truncation=True, max_length=512)
-                        logits, stats = tracker.measure_text(tokens.input_ids, tokenizer)
-                    else:
-                        logits, stats = tracker.measure_text(prompt, tokenizer)
-
-                    # Decode logits -> generated text
-                    generated_tokens = torch.argmax(logits, dim=-1)
-                    generated_text = tokenizer.batch_decode(generated_tokens, skip_special_tokens=True)[0]
-
+                    logits, stats = tracker.measure_text(tokens.input_ids, tokenizer)
                 except torch.cuda.OutOfMemoryError:
+                    # Retry with shorter input
                     print(f"OOM in {mode}, truncating input...")
                     tokens = tokenizer(prompt, return_tensors='pt', truncation=True, max_length=256)
                     logits, stats = tracker.measure_text(tokens.input_ids, tokenizer)
-                    generated_tokens = torch.argmax(logits, dim=-1)
-                    generated_text = tokenizer.batch_decode(generated_tokens, skip_special_tokens=True)[0]
+                    
+                # Decode logits -> generated text
+                generated_tokens = torch.argmax(logits, dim=-1)
+                generated_text = tokenizer.batch_decode(generated_tokens, skip_special_tokens=True)[0]
 
-                # Evaluate correctness
-                is_correct = evaluate_generated_code(generated_text, test_cases)
+                # Decode and evaluate correctness
+                generated = tokenizer.batch_decode(torch.argmax(logits, dim=-1), skip_special_tokens=True)[0]
+                is_correct = evaluate_generated_code(generated, test_cases)
 
                 # Record full info
                 results[mode]["examples"].append({
@@ -376,7 +370,7 @@ def test_generation_MATH(
     dataset_config='all',
     split='test',
     num_examples=50,
-    verbose=True
+    verbose=True, device_map: str = "auto"
 ):
     """
     Benchmark energy use and accuracy on MATH dataset.
@@ -403,9 +397,9 @@ def test_generation_MATH(
         try:
             clean_memory()
             # Load model with given quantization
-            model = load_llm(model_name, mode=mode)
-            precision = 'float16' if mode == 'fp16' else None
-            tracker = EnergyTracker(model, precision_mode=precision)
+            model = load_llm(model_name, mode=mode, device_map=device_map)
+            q_mode, _ = _parse_mode(mode)                        # get 'fp32','fp16','int8','int4'
+            tracker = EnergyTracker(model, precision_mode=q_mode)  # pass correct precision
 
             correct = 0
             total_tokens = 0
@@ -413,11 +407,15 @@ def test_generation_MATH(
             # Iterate over examples
             for item in tqdm(ds, desc=f"MATH {mode.upper()}"):
                 question = item['question']
-                answer = item['answer']
+                answer   = item['answer'].strip()
 
+                # Tokenize consistently
+                tokens = tokenizer(question, return_tensors='pt',
+                                   truncation=True, max_length=512)
+                
                 # Measure energy and get logits
                 try:
-                    logits, stats = tracker.measure_text(question, tokenizer)
+                    logits, stats = tracker.measure_text(tokens.input_ids, tokenizer)
                 except torch.cuda.OutOfMemoryError:
                     # Retry with shorter input on OOM
                     tokens = tokenizer(question, return_tensors='pt', truncation=True, max_length=256)
@@ -484,7 +482,7 @@ def test_generation_MMLU(
     dataset_name='mmlu',
     split='validation',
     num_examples=50,
-    verbose=True
+    verbose=True, device_map: str = "auto"
 ):
     """
     Benchmark energy use and accuracy on MMLU dataset.
@@ -510,9 +508,10 @@ def test_generation_MMLU(
 
         # Free GPU memory and load model + tracker
         clean_memory()
-        model = load_llm(model_name, mode=mode)
-        precision = 'float16' if mode == 'fp16' else None
-        tracker = EnergyTracker(model, precision_mode=precision)
+        model = load_llm(model_name, mode=mode, device_map=device_map)
+        # parse quantization to get correct precision_mode
+        q_mode, _ = _parse_mode(mode)
+        tracker = EnergyTracker(model, precision_mode=q_mode)
 
         correct = 0
         total_tokens = 0
@@ -526,9 +525,13 @@ def test_generation_MMLU(
             # Build prompt with multiple-choice options
             prompt = question + "\nChoices: " + ", ".join(choices) + "\nAnswer:"
 
+             # Tokenize prompt consistently
+            tokens = tokenizer(prompt, return_tensors='pt',
+                               truncation=True, max_length=512)
+            
             # Measure energy & get logits
             try:
-                logits, stats = tracker.measure_text(prompt, tokenizer)
+                logits, stats = tracker.measure_text(tokens.input_ids, tokenizer)
             except torch.cuda.OutOfMemoryError:
                 # Retry with truncated input on OOM
                 tokens = tokenizer(prompt, return_tensors='pt',
