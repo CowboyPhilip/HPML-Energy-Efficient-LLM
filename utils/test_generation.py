@@ -16,6 +16,9 @@ from utils.adaptive_quant import AdaptiveQuantGenerator
 import re
 import ast
 
+import contextlib
+import io
+
 def extract_clean_function_code_from_output(text):
     """
     从模型输出中提取 [BEGIN]<｜Assistant｜><think> 和 [END]<｜Assistant｜><think> 之间的代码，
@@ -214,10 +217,6 @@ def quick_test_generation(model_name, quant_mode='fp16', device_map: str = "auto
     return stats
 
 
-from datasets import load_dataset
-from tqdm import tqdm
-import contextlib
-import io
 
 def evaluate_generated_code(generated_code, test_cases):
     """
