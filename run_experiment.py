@@ -77,6 +77,7 @@ def run_generation(args):
 def run_math(args):
     """Run MATH dataset benchmark."""
     print(f"\n=== Testing MATH on {args.model} ===")
+    
     stats = test_generation_MATH(
         model_name=args.model,
         quantization_modes=args.modes,
@@ -85,7 +86,13 @@ def run_math(args):
         split=args.split,
         num_examples=args.num_examples,
         verbose=args.verbose,
-        device_map=args.device_map    # pass through
+        device_map=args.device_map,
+        temperature=args.temperature,
+        top_p=args.top_p,
+        high_mode=args.high_mode,
+        low_mode=args.low_mode,
+        ctx_threshold=args.ctx_threshold,
+        latency_threshold=args.latency_threshold
     )
     return {"math": stats}
 
@@ -98,7 +105,13 @@ def run_mbpp(args):
         quantization_modes=args.modes,
         num_examples=args.num_examples,
         verbose=args.verbose,
-        device_map=args.device_map    # pass through
+        device_map=args.device_map,
+        temperature=args.temperature,
+        top_p=args.top_p,
+        high_mode=args.high_mode,
+        low_mode=args.low_mode,
+        ctx_threshold=args.ctx_threshold,
+        latency_threshold=args.latency_threshold
     )
     return {"mbpp": stats}
 
@@ -193,6 +206,14 @@ def main():
         "--low_mode", default="int8_vanilla",
         help="Low-precision mode for adaptive"
     )
+    parser.add_argument(
+        "--ctx_threshold", type=int, default=1024,
+        help="context-length threshold to switch modes"
+    )
+    parser.add_argument(
+        "--latency_threshold", type=float, default=0.08,
+        help="per-token latency threshold to switch modes"
+    )
     # generation
     parser.add_argument(
         "--prompt", default="Hello world",
@@ -253,12 +274,12 @@ def main():
 
     args = parser.parse_args()
 
-    # adaptive only for generation
-    modes = args.modes
-    if args.task != "generation" and "adaptive" in modes:
-        print("Warning: 'adaptive' only supported for generation; skipping.")
-        modes.remove("adaptive")
-    args.modes = modes
+    # # adaptive only for generation
+    # modes = args.modes
+    # if args.task != "generation" and "adaptive" in modes:
+    #     print("Warning: 'adaptive' only supported for generation; skipping.")
+    #     modes.remove("adaptive")
+    # args.modes = modes
 
     wandb.init(
     project="HPML-Energy-Efficient-LLM",
