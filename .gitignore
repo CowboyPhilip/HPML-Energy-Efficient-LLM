@@ -74,6 +74,8 @@ Icon?
 secrets.yaml
 config.yaml
 config.json
+.wandb/
+wandb/
 
 # ------------------------------
 # Pip/conda environment exports (optional)
