@@ -119,8 +119,8 @@ class AdaptiveQuantGenerator:
             inputs[k] = v.to(model.device)
 
         # run generation under one monitor
-        with tracker:
-            outputs = model.generate(
+        # with tracker:
+        outputs = model.generate(
                 **inputs,
                 max_new_tokens=max_new_tokens,
                 do_sample=(temperature is not None),
