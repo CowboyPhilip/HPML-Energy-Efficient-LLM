@@ -1,0 +1,1732 @@
+{
+  "math": {
+    "fp16": {
+      "examples": [
+        {
+          "prompt": "# Instruction: Solve the following problem.\n# Problem: b'Solve -282*d + 929 - 178 = -1223 for d.\\n'\n# Answer:",
+          "ground_truth": "b'7\\n'",
+          "prediction": "# Instruction: Solve the following problem.\n# Problem: b'Solve -282*d + 929 - 178 = -1223 for d.\\n'\n# Answer: d = 1222\nAlright, so I've got this equation to solve: -282*d + 929 - 178 = -1223. Hmm, okay, let me try to figure this out step by step. I'm a bit nervous because equations can be tricky, especially with negative numbers and all, but I'll take it slow.\n\nFirst, I need to simplify the left side of the equation as much as possible. The left side has two terms with 'd' and some constants. Let me write it down again: -282*d + 92",
+          "is_correct": false,
+          "stats": {
+            "total_energy": 3426.4952873039206,
+            "tokenization_energy": 0.5692873039245606,
+            "inference_energy": 3425.925999999996,
+            "energy_per_token": 19.921484228511165,
+            "time": 76.65189003944397,
+            "components": {
+              "embeddings": 78.15840401053447,
+              "attention": 1462.6806349208691,
+              "ffn": 1856.0907788038285,
+              "layernorm": 42.255022475722306,
+              "output_layer": 136.47373895048122
+            },
+            "num_tokens": 172
+          }
+        },
+        {
+          "prompt": "# Instruction: Solve the following problem.\n# Problem: b'Solve 49*l + 45*l - 125 - 63 = 0 for l.\\n'\n# Answer:",
+          "ground_truth": "b'2\\n'",
+          "prediction": "# Instruction: Solve the following problem.\n# Problem: b'Solve 49*l + 45*l - 125 - 63 = 0 for l.\\n'\n# Answer: l = 125/128\n\nWait, the answer is l = 125/128. But according to my calculations, it's l = 125/128. Wait, but the problem says to solve 49*l + 45*l - 125 - 63 = 0 for l. Hmm, maybe I made a mistake in adding the coefficients.\n\nWait, let me try again. 49l + 45l is 94l, right? Then, -125 -63 is -188",
+          "is_correct": false,
+          "stats": {
+            "total_energy": 3573.804115042688,
+            "tokenization_energy": 0.15411504268646242,
+            "inference_energy": 3573.6500000000015,
+            "energy_per_token": 20.777930901410976,
+            "time": 75.11212110519409,
+            "components": {
+              "embeddings": 31.60023001885018,
+              "attention": 1611.4503054544716,
+              "ffn": 2032.626757708308,
+              "layernorm": 48.43223190665402,
+              "output_layer": 183.90580060005195
+            },
+            "num_tokens": 172
+          }
+        },
+        {
+          "prompt": "# Instruction: Solve the following problem.\n# Problem: b'Solve -64*t + 1387 - 848 + 933 = 0 for t.\\n'\n# Answer:",
+          "ground_truth": "b'23\\n'",
+          "prediction": "# Instruction: Solve the following problem.\n# Problem: b'Solve -64*t + 1387 - 848 + 933 = 0 for t.\\n'\n# Answer: t = 1387 - 1387 + 933 - 848 + 1387 - 1387 + 933 - 848 + 1387 - 1387 + 933 - 848 + 1387 - 1387 + 933 - 848 + 1387 - 1387 + 933 - 848 + 1387 - 1387 + 933",
+          "is_correct": false,
+          "stats": {
+            "total_energy": 3722.9504763846408,
+            "tokenization_energy": 0.14147638463974,
+            "inference_energy": 3722.809000000001,
+            "energy_per_token": 21.396267105658854,
+            "time": 74.84086728096008,
+            "components": {
+              "embeddings": 53.68857745789992,
+              "attention": 1751.1720832264555,
+              "ffn": 1968.8439577843938,
+              "layernorm": 32.38482673550403,
+              "output_layer": 165.4175574700588
+            },
+            "num_tokens": 174
+          }
+        },
+        {
+          "prompt": "# Instruction: Solve the following problem.\n# Problem: b'Solve 75*g = 192*g - 71*g - 79*g - 264 for g.\\n'\n# Answer:",
+          "ground_truth": "b'-8\\n'",
+          "prediction": "# Instruction: Solve the following problem.\n# Problem: b'Solve 75*g = 192*g - 71*g - 79*g - 264 for g.\\n'\n# Answer: g = 12\nAlright, so I've got this equation here: 75g equals 192g minus 71g minus 79g minus 264. Hmm, okay, let me try to figure this out step by step. I'm a bit nervous because I'm not super confident with algebra, but I'll give it a shot.\n\nFirst, let me write down the equation to make it clearer:\n\n75g = 192g - 71g - 79g - 264\n\nAlright, so the left side is 75g",
+          "is_correct": false,
+          "stats": {
+            "total_energy": 3882.8797507689005,
+            "tokenization_energy": 0.1447507688999176,
+            "inference_energy": 3882.7350000000006,
+            "energy_per_token": 22.061816765732388,
+            "time": 74.76680541038513,
+            "components": {
+              "embeddings": 50.4405135996319,
+              "attention": 1717.3456128203743,
+              "ffn": 2056.835759374401,
+              "layernorm": 54.6757267520437,
+              "output_layer": 172.63626020338177
+            },
+            "num_tokens": 176
+          }
+        },
+        {
+          "prompt": "# Instruction: Solve the following problem.\n# Problem: b'Solve -34*v + 232*v + 52351 = 48985 for v.\\n'\n# Answer:",
+          "ground_truth": "b'-17\\n'",
+          "prediction": "# Instruction: Solve the following problem.\n# Problem: b'Solve -34*v + 232*v + 52351 = 48985 for v.\\n'\n# Answer: v = 12345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345",
+          "is_correct": false,
+          "stats": {
+            "total_energy": 4008.3519736137378,
+            "tokenization_energy": 0.1799736137390137,
+            "inference_energy": 4008.1719999999987,
+            "energy_per_token": 22.90486842064993,
+            "time": 74.9605324268341,
+            "components": {
+              "embeddings": 80.32678503941366,
+              "attention": 1870.04596524124,
+              "ffn": 2089.560105189331,
+              "layernorm": 40.24572980285151,
+              "output_layer": 209.8172470765071
+            },
+            "num_tokens": 175
+          }
+        },
+        {
+          "prompt": "# Instruction: Solve the following problem.\n# Problem: b'Solve 21*w + 26*w - 9*w - 3*w + 980 = 0 for w.\\n'\n# Answer:",
+          "ground_truth": "b'-28\\n'",
+          "prediction": "# Instruction: Solve the following problem.\n# Problem: b'Solve 21*w + 26*w - 9*w - 3*w + 980 = 0 for w.\\n'\n# Answer: w = 100\n</think>\n\n**Solution:**\n\n\u6211\u4eec\u9700\u8981\u89e3\u65b9\u7a0b\uff1a\n\\[\n21w + 26w - 9w - 3w + 980 = 0\n\\]\n\n**\u6b65\u9aa4\u5982\u4e0b\uff1a**\n\n1. **\u5408\u5e76\u540c\u7c7b\u9879\uff1a**\n   \\[\n   21w + 26w = 47w\n   \\]\n   \\[\n   -9w - 3w = -12w\n   \\]\n   \u6240\u4ee5\uff0c\u65b9\u7a0b\u53d8\u4e3a\uff1a\n   \\[\n   47w - 12w + 98",
+          "is_correct": false,
+          "stats": {
+            "total_energy": 4046.229563583377,
+            "tokenization_energy": 0.4655635833740234,
+            "inference_energy": 4045.764000000003,
+            "energy_per_token": 22.989940702178277,
+            "time": 75.44950675964355,
+            "components": {
+              "embeddings": 79.05319437122542,
+              "attention": 1935.1109902432565,
+              "ffn": 2269.844313157563,
+              "layernorm": 39.633071935882676,
+              "output_layer": 216.28669992829248
+            },
+            "num_tokens": 176
+          }
+        },
+        {
+          "prompt": "# Instruction: Solve the following problem.\n# Problem: b'Solve -21*v - 96 = 156 for v.\\n'\n# Answer:",
+          "ground_truth": "b'-12\\n'",
+          "prediction": "# Instruction: Solve the following problem.\n# Problem: b'Solve -21*v - 96 = 156 for v.\\n'\n# Answer: v = -12\n\nAlright, so I have this equation to solve: -21*v - 96 = 156. I need to find the value of v. Hmm, okay, let me think about how to approach this step by step.\n\nFirst, I remember that to solve for a variable, I need to isolate it on one side of the equation. So, in this case, I want to get v by itself. The equation is -21*v - 96 = 156. I see that there are two terms involving v: -21*v and -96.",
+          "is_correct": false,
+          "stats": {
+            "total_energy": 4013.5477996621134,
+            "tokenization_energy": 0.1707996621131897,
+            "inference_energy": 4013.3770000000004,
+            "energy_per_token": 24.472852436964107,
+            "time": 74.79716348648071,
+            "components": {
+              "embeddings": 35.5816939041568,
+              "attention": 1832.938222629281,
+              "ffn": 2186.502749262889,
+              "layernorm": 56.14808472658345,
+              "output_layer": 192.6626332201829
+            },
+            "num_tokens": 164
+          }
+        },
+        {
+          "prompt": "# Instruction: Solve the following problem.\n# Problem: b'Solve -12*t - 4482 = 64*t - 383*t + 141*t for t.\\n'\n# Answer:",
+          "ground_truth": "b'27\\n'",
+          "prediction": "# Instruction: Solve the following problem.\n# Problem: b'Solve -12*t - 4482 = 64*t - 383*t + 141*t for t.\\n'\n# Answer: t = -12\n</think>\n\n**Solution:**\n\nWe need to solve the equation for \\( t \\):\n\n\\[\n-12t - 4482 = 64t - 383t + 141t\n\\]\n\n**Step 1:** Simplify the right side of the equation.\n\n\\[\n64t - 383t + 141t = (64 - 383 + 141)t = (-178)t\n\\]\n\nSo, the equation becomes:\n\n\\[\n-12t - 4482",
+          "is_correct": false,
+          "stats": {
+            "total_energy": 4026.144999999997,
+            "tokenization_energy": 5.94199999999546,
+            "inference_energy": 4020.2030000000013,
+            "energy_per_token": 22.61879213483144,
+            "time": 74.69598484039307,
+            "components": {
+              "embeddings": 69.31028328348627,
+              "attention": 1639.3942350904883,
+              "ffn": 2212.9959821284237,
+              "layernorm": 50.43179949163762,
+              "output_layer": 160.58476864004774
+            },
+            "num_tokens": 178
+          }
+        },
+        {
+          "prompt": "# Instruction: Solve the following problem.\n# Problem: b'Solve -516 = -106*h + 4183 - 247 for h.\\n'\n# Answer:",
+          "ground_truth": "b'42\\n'",
+          "prediction": "# Instruction: Solve the following problem.\n# Problem: b'Solve -516 = -106*h + 4183 - 247 for h.\\n'\n# Answer: h = 100.5\nAlright, so I've got this equation to solve for h: -516 = -106*h + 4183 - 247. Hmm, let me try to figure this out step by step. I'm a bit nervous because I don't want to make any mistakes, but I'll take it slow.\n\nFirst, I need to simplify the equation as much as possible. Let me look at the right side: -106*h + 4183 - 247. I can combine the constants 4183 and",
+          "is_correct": false,
+          "stats": {
+            "total_energy": 4040.0454910759977,
+            "tokenization_energy": 0.2524910759925842,
+            "inference_energy": 4039.793000000005,
+            "energy_per_token": 23.488636576023243,
+            "time": 74.98885917663574,
+            "components": {
+              "embeddings": 41.595143703215285,
+              "attention": 1726.4825485146832,
+              "ffn": 2372.737041705292,
+              "layernorm": 60.88769783041947,
+              "output_layer": 179.78004110648936
+            },
+            "num_tokens": 172
+          }
+        },
+        {
+          "prompt": "# Instruction: Solve the following problem.\n# Problem: b'Solve -5437 = 149*q - 2717 + 2942 for q.\\n'\n# Answer:",
+          "ground_truth": "b'-38\\n'",
+          "prediction": "# Instruction: Solve the following problem.\n# Problem: b'Solve -5437 = 149*q - 2717 + 2942 for q.\\n'\n# Answer: q = 149\n</think>\n\n**Solution:**\n\nWe are given the equation:\n\n\\[\nb'Solve -5437 = 149\\,q - 2717 + 2942\\,for\\,q.\\,Answer:\\,q = 149\n\\]\n\n\u9996\u5148\uff0c\u5c06\u65b9\u7a0b\u7b80\u5316\uff1a\n\n\\[\n-5437 = 149\\,q - 2717 + 2942\n\\]\n\n\u8ba1\u7b97\u5e38\u6570\u9879\uff1a\n\n\\[\n-2717 + 2942 = 22",
+          "is_correct": false,
+          "stats": {
+            "total_energy": 4029.1277170286153,
+            "tokenization_energy": 0.21171702861785888,
+            "inference_energy": 4028.9159999999974,
+            "energy_per_token": 23.155906419704685,
+            "time": 75.04601764678955,
+            "components": {
+              "embeddings": 35.49741941762041,
+              "attention": 1788.6702896985994,
+              "ffn": 2221.31415230734,
+              "layernorm": 65.86009387850413,
+              "output_layer": 193.56859869861393
+            },
+            "num_tokens": 174
+          }
+        },
+        {
+          "prompt": "# Instruction: Solve the following problem.\n# Problem: b'Solve -10500 = -3300*p + 1800*p for p.\\n'\n# Answer:",
+          "ground_truth": "b'7\\n'",
+          "prediction": "# Instruction: Solve the following problem.\n# Problem: b'Solve -10500 = -3300*p + 1800*p for p.\\n'\n# Answer: p = 10500/3300\nBut the answer is wrong. What's the correct way to solve this equation?\nLet me try to solve it step by step.\n\nFirst, I'll write down the equation:\n\n-10500 = -3300*p + 1800*p\n\nI think I should combine like terms on the right side. So, -3300*p + 1800*p is equal to (-3300 + 1800)*p, which is (-1500)*p.\n\nSo, the equation",
+          "is_correct": false,
+          "stats": {
+            "total_energy": 4018.7690549192466,
+            "tokenization_energy": 0.1620549192428589,
+            "inference_energy": 4018.6070000000036,
+            "energy_per_token": 23.50157342058039,
+            "time": 74.87009263038635,
+            "components": {
+              "embeddings": 41.53649009419209,
+              "attention": 1672.2431414739153,
+              "ffn": 2224.9230049518937,
+              "layernorm": 75.91522079628334,
+              "output_layer": 195.3396322219529
+            },
+            "num_tokens": 171
+          }
+        },
+        {
+          "prompt": "# Instruction: Solve the following problem.\n# Problem: b'Solve -351*s - 5051 = 586*s - 623 + 6816 for s.\\n'\n# Answer:",
+          "ground_truth": "b'-12\\n'",
+          "prediction": "# Instruction: Solve the following problem.\n# Problem: b'Solve -351*s - 5051 = 586*s - 623 + 6816 for s.\\n'\n# Answer: s = -100.5\nAlright, so I've got this equation to solve: -351*s - 5051 = 586*s - 623 + 6816. Hmm, okay. Let me try to figure this out step by step. I'm a bit nervous because equations can be tricky, especially with negative numbers and all. But I'll take it slow.\n\nFirst, I need to solve for s. That means I have to get all the terms with s on one side and the constants on the other side. Let me write down the equation again to",
+          "is_correct": false,
+          "stats": {
+            "total_energy": 4033.2513464164676,
+            "tokenization_energy": 0.15434641647338868,
+            "inference_energy": 4033.0969999999943,
+            "energy_per_token": 22.532130426907642,
+            "time": 74.90989637374878,
+            "components": {
+              "embeddings": 86.05841383979936,
+              "attention": 1863.8157940484602,
+              "ffn": 2083.866265462895,
+              "layernorm": 34.97587381242938,
+              "output_layer": 198.26055795526645
+            },
+            "num_tokens": 179
+          }
+        },
+        {
+          "prompt": "# Instruction: Solve the following problem.\n# Problem: b'Solve 1633 = 327*u - 891 - 944 - 1110 for u.\\n'\n# Answer:",
+          "ground_truth": "b'14\\n'",
+          "prediction": "# Instruction: Solve the following problem.\n# Problem: b'Solve 1633 = 327*u - 891 - 944 - 1110 for u.\\n'\n# Answer: u = 1633 + 891 + 944 + 1110 - 327*u\nWait, that doesn't make sense. I think I'm misunderstanding the problem. Let me try again. The problem is to solve for u in the equation 1633 = 327*u - 891 - 944 - 1110. But when I rearrange it, I get u = 1633 + 891 + 944 + 1110 - 327*u.",
+          "is_correct": false,
+          "stats": {
+            "total_energy": 4036.9389999999985,
+            "tokenization_energy": 5.724000000001979,
+            "inference_energy": 4031.2149999999965,
+            "energy_per_token": 22.679432584269655,
+            "time": 74.85700726509094,
+            "components": {
+              "embeddings": 68.12012655424338,
+              "attention": 1762.5608238398568,
+              "ffn": 2323.3049712802194,
+              "layernorm": 60.42665231034718,
+              "output_layer": 171.34804307249317
+            },
+            "num_tokens": 178
+          }
+        },
+        {
+          "prompt": "# Instruction: Solve the following problem.\n# Problem: b'Solve 8*x + 77 = -7*x - 158 + 70 for x.\\n'\n# Answer:",
+          "ground_truth": "b'-11\\n'",
+          "prediction": "# Instruction: Solve the following problem.\n# Problem: b'Solve 8*x + 77 = -7*x - 158 + 70 for x.\\n'\n# Answer: x = -10\n\nAlright, so I've got this equation to solve: 8x + 77 = -7x - 158 + 70. Hmm, okay, let me try to figure this out step by step. I remember from class that solving equations like this usually involves getting all the x terms on one side and the constants on the other. So, first, maybe I should simplify both sides of the equation as much as possible.\n\nLooking at the right side of the equation, I see -158 + 70. Let me calculate that. So, -158",
+          "is_correct": false,
+          "stats": {
+            "total_energy": 4038.029065596099,
+            "tokenization_energy": 0.15906559610366822,
+            "inference_energy": 4037.8699999999953,
+            "energy_per_token": 23.614205061965492,
+            "time": 75.00850057601929,
+            "components": {
+              "embeddings": 42.15872225283797,
+              "attention": 1901.4710199664114,
+              "ffn": 2160.040414603259,
+              "layernorm": 51.01399443936161,
+              "output_layer": 198.41028852413314
+            },
+            "num_tokens": 171
+          }
+        },
+        {
+          "prompt": "# Instruction: Solve the following problem.\n# Problem: b'Solve -51*u + 22*u + 729 = -79*u - 1171 for u.\\n'\n# Answer:",
+          "ground_truth": "b'-38\\n'",
+          "prediction": "# Instruction: Solve the following problem.\n# Problem: b'Solve -51*u + 22*u + 729 = -79*u - 1171 for u.\\n'\n# Answer: u = -1171/118 + 729/118\n# Wait, the answer is wrong. What should I do?\n</think>\n\n**Solution:**\n\nWe start with the given equation:\n\n\\[\n-51u + 22u + 729 = -79u - 1171\n\\]\n\n**Step 1:** Combine like terms on the left side.\n\n\\[\n(-51u + 22u) + 729 = -79u - 1171\n\\]\n\\[\n-29u +",
+          "is_correct": false,
+          "stats": {
+            "total_energy": 4022.5305006942763,
+            "tokenization_energy": 0.18550069427490234,
+            "inference_energy": 4022.345000000001,
+            "energy_per_token": 22.855286935762933,
+            "time": 74.97820901870728,
+            "components": {
+              "embeddings": 41.328389277467735,
+              "attention": 1827.1886507573697,
+              "ffn": 2154.30854063101,
+              "layernorm": 45.602158396469434,
+              "output_layer": 230.54842356509423
+            },
+            "num_tokens": 176
+          }
+        },
+        {
+          "prompt": "# Instruction: Solve the following problem.\n# Problem: b'Solve 0 = 4018*q - 4444 - 3592 for q.\\n'\n# Answer:",
+          "ground_truth": "b'2\\n'",
+          "prediction": "# Instruction: Solve the following problem.\n# Problem: b'Solve 0 = 4018*q - 4444 - 3592 for q.\\n'\n# Answer: q = 1000\n</think>\n\n**Solution:**\n\nWe are given the equation:\n\\[\n0 = 4018q - 4444 - 3592\n\\]\n\n**Step 1:** Combine the constant terms on the right side.\n\\[\n0 = 4018q - (4444 + 3592)\n\\]\n\\[\n0 = 4018q - 8036\n\\]\n\n**Step 2:** Move the constant term to the left side.\n\\[\n4018q = 80",
+          "is_correct": false,
+          "stats": {
+            "total_energy": 4125.88811991072,
+            "tokenization_energy": 0.4971199107170105,
+            "inference_energy": 4125.391000000003,
+            "energy_per_token": 23.987721627387906,
+            "time": 77.35268044471741,
+            "components": {
+              "embeddings": 43.617093411923975,
+              "attention": 1795.98222656907,
+              "ffn": 2299.175025121194,
+              "layernorm": 40.755475591192834,
+              "output_layer": 205.6899642882708
+            },
+            "num_tokens": 172
+          }
+        },
+        {
+          "prompt": "# Instruction: Solve the following problem.\n# Problem: b'Solve 34338*y = 34271*y - 3216 for y.\\n'\n# Answer:",
+          "ground_truth": "b'-48\\n'",
+          "prediction": "# Instruction: Solve the following problem.\n# Problem: b'Solve 34338*y = 34271*y - 3216 for y.\\n'\n# Answer: y = 10000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000",
+          "is_correct": false,
+          "stats": {
+            "total_energy": 4054.904311599729,
+            "tokenization_energy": 0.1473115997314453,
+            "inference_energy": 4054.756999999998,
+            "energy_per_token": 23.575025067440286,
+            "time": 75.47028374671936,
+            "components": {
+              "embeddings": 80.37141096304521,
+              "attention": 1763.273199059284,
+              "ffn": 2210.2635952417495,
+              "layernorm": 29.722632870201135,
+              "output_layer": 214.7391258220493
+            },
+            "num_tokens": 172
+          }
+        },
+        {
+          "prompt": "# Instruction: Solve the following problem.\n# Problem: b'Solve -12463 - 56347 = -2338*d + 58334 - 12582 for d.\\n'\n# Answer:",
+          "ground_truth": "b'49\\n'",
+          "prediction": "# Instruction: Solve the following problem.\n# Problem: b'Solve -12463 - 56347 = -2338*d + 58334 - 12582 for d.\\n'\n# Answer: d = 12345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345",
+          "is_correct": false,
+          "stats": {
+            "total_energy": 4034.5331247835175,
+            "tokenization_energy": 0.15012478351593017,
+            "inference_energy": 4034.3830000000016,
+            "energy_per_token": 21.808287160991988,
+            "time": 74.96860980987549,
+            "components": {
+              "embeddings": 35.19558686828998,
+              "attention": 1923.5962817297725,
+              "ffn": 2234.0823261757578,
+              "layernorm": 60.37859453011281,
+              "output_layer": 178.23443162967394
+            },
+            "num_tokens": 185
+          }
+        },
+        {
+          "prompt": "# Instruction: Solve the following problem.\n# Problem: b'Solve 315*k + 6462 + 1204 = -162*k - 6167 for k.\\n'\n# Answer:",
+          "ground_truth": "b'-29\\n'",
+          "prediction": "# Instruction: Solve the following problem.\n# Problem: b'Solve 315*k + 6462 + 1204 = -162*k - 6167 for k.\\n'\n# Answer: k = -100.5\nAlright, so I've got this equation to solve for k. Let me write it down again to make sure I have it right:\n\n315k + 6462 + 1204 = -162k - 6167\n\nHmm, okay. So, I need to solve for k. That means I have to get all the terms with k on one side and the constants on the other side. Let me see how to approach this.\n\nFirst, maybe I should combine like terms on both sides. On the left side, I have",
+          "is_correct": false,
+          "stats": {
+            "total_energy": 4015.4516481513956,
+            "tokenization_energy": 0.4446481513977051,
+            "inference_energy": 4015.006999999998,
+            "energy_per_token": 22.3080647119522,
+            "time": 74.58149600028992,
+            "components": {
+              "embeddings": 30.46653007293527,
+              "attention": 1879.2993907160253,
+              "ffn": 2103.8052129041553,
+              "layernorm": 35.140227647785096,
+              "output_layer": 189.0928952455509
+            },
+            "num_tokens": 180
+          }
+        },
+        {
+          "prompt": "# Instruction: Solve the following problem.\n# Problem: b'Solve -5444 = -458*f - 25596 for f.\\n'\n# Answer:",
+          "ground_truth": "b'-44\\n'",
+          "prediction": "# Instruction: Solve the following problem.\n# Problem: b'Solve -5444 = -458*f - 25596 for f.\\n'\n# Answer: f = 64\nAlright, so I have this equation to solve: -5444 equals -458 times f minus 25596. I need to find the value of f. Hmm, okay, let me think about how to approach this.\n\nFirst, I should probably write down the equation to make it clearer. So, it's:\n\n-5444 = -458f - 25596\n\nI need to solve for f. That means I have to isolate f on one side of the equation. To do that, I can start by getting rid of",
+          "is_correct": false,
+          "stats": {
+            "total_energy": 4044.4674588820994,
+            "tokenization_energy": 0.15145888209342956,
+            "inference_energy": 4044.316000000006,
+            "energy_per_token": 23.931760111728398,
+            "time": 75.09483432769775,
+            "components": {
+              "embeddings": 80.39106575703272,
+              "attention": 1909.1401245742145,
+              "ffn": 2179.470543624706,
+              "layernorm": 50.58070203161938,
+              "output_layer": 155.94691695666944
+            },
+            "num_tokens": 169
+          }
+        }
+      ],
+      "summary": {
+        "examples": 20,
+        "avg_energy": 3959.717040270876,
+        "avg_time": 75.17006791830063,
+        "energy_per_token": 22.71782581911002,
+        "accuracy": 0.0,
+        "carbon_emissions": 2419.8270801655353
+      }
+    },
+    "int8_vanilla": {
+      "examples": [
+        {
+          "prompt": "# Instruction: Solve the following problem.\n# Problem: b'Solve -282*d + 929 - 178 = -1223 for d.\\n'\n# Answer:",
+          "ground_truth": "b'7\\n'",
+          "prediction": "# Instruction: Solve the following problem.\n# Problem: b'Solve -282*d + 929 - 178 = -1223 for d.\\n'\n# Answer: d = 1222\nAlright, so I've got this equation to solve: -282*d + 929 - 178 = -1223. Hmm, okay, let me try to figure this out step by step. I'm a bit nervous because I'm not super confident with algebra, but I'll give it a shot.\n\nFirst, I need to solve for d. That means I have to get d by itself on one side of the equation. Right now, it's multiplied by -282 and then there are some constants added and subtracted. So, maybe",
+          "is_correct": false,
+          "stats": {
+            "total_energy": 3953.5190000000002,
+            "tokenization_energy": 3.2550000000046566,
+            "inference_energy": 3950.2639999999956,
+            "energy_per_token": 22.98557558139535,
+            "time": 80.22298431396484,
+            "components": {
+              "embeddings": 47.69012680651585,
+              "attention": 2480.293368486437,
+              "ffn": 1573.8984873769114,
+              "layernorm": 21.566617013923704,
+              "output_layer": 145.7379378533452
+            },
+            "num_tokens": 172
+          }
+        },
+        {
+          "prompt": "# Instruction: Solve the following problem.\n# Problem: b'Solve 49*l + 45*l - 125 - 63 = 0 for l.\\n'\n# Answer:",
+          "ground_truth": "b'2\\n'",
+          "prediction": "# Instruction: Solve the following problem.\n# Problem: b'Solve 49*l + 45*l - 125 - 63 = 0 for l.\\n'\n# Answer: l = 125/128\n\nAlright, so I've got this equation to solve: 49l + 45l - 125 - 63 = 0. Hmm, okay, let me try to figure this out step by step. I'm a bit nervous because I don't want to make any mistakes, but I'll take it slow.\n\nFirst, I remember that when solving equations, the goal is to isolate the variable, which in this case is l. So, I need to get all the terms with l on one side and the constants on the other side. Let",
+          "is_correct": false,
+          "stats": {
+            "total_energy": 3902.1226068449,
+            "tokenization_energy": 0.2406068449020386,
+            "inference_energy": 3901.881999999998,
+            "energy_per_token": 22.686759342121512,
+            "time": 78.7012882232666,
+            "components": {
+              "embeddings": 53.87639984440966,
+              "attention": 2413.4048376369974,
+              "ffn": 1806.1987362496773,
+              "layernorm": 45.452597940203965,
+              "output_layer": 154.64754487822438
+            },
+            "num_tokens": 172
+          }
+        },
+        {
+          "prompt": "# Instruction: Solve the following problem.\n# Problem: b'Solve -64*t + 1387 - 848 + 933 = 0 for t.\\n'\n# Answer:",
+          "ground_truth": "b'23\\n'",
+          "prediction": "# Instruction: Solve the following problem.\n# Problem: b'Solve -64*t + 1387 - 848 + 933 = 0 for t.\\n'\n# Answer: t = 1387 - 1387 + 933 - 848 + 1387 - 1387 + 933 - 848 + 1387 - 1387 + 933 - 848 + 1387 - 1387 + 933 - 848 + 1387 - 1387 + 933 - 848 + 1387 - 1387 + 933",
+          "is_correct": false,
+          "stats": {
+            "total_energy": 3911.894023289204,
+            "tokenization_energy": 0.3370232892036438,
+            "inference_energy": 3911.5570000000007,
+            "energy_per_token": 22.482149559133358,
+            "time": 78.97705507278442,
+            "components": {
+              "embeddings": 48.270352863557406,
+              "attention": 2545.635802034808,
+              "ffn": 1787.7163148913155,
+              "layernorm": 60.27843166685512,
+              "output_layer": 198.98363181616867
+            },
+            "num_tokens": 174
+          }
+        },
+        {
+          "prompt": "# Instruction: Solve the following problem.\n# Problem: b'Solve 75*g = 192*g - 71*g - 79*g - 264 for g.\\n'\n# Answer:",
+          "ground_truth": "b'-8\\n'",
+          "prediction": "# Instruction: Solve the following problem.\n# Problem: b'Solve 75*g = 192*g - 71*g - 79*g - 264 for g.\\n'\n# Answer: g = 12\n\nAlright, so I've got this equation here: 75g equals 192g minus 71g minus 79g minus 264. I need to solve for g. Hmm, okay, let me think about how to approach this.\n\nFirst, I should probably simplify the right side of the equation. There are multiple terms with g, so maybe I can combine them. Let me write that out:\n\n75g = (192g - 71g - 79g) - 264\n\nAlright, so let's compute the",
+          "is_correct": false,
+          "stats": {
+            "total_energy": 3880.965843978887,
+            "tokenization_energy": 0.36984397888183596,
+            "inference_energy": 3880.596000000005,
+            "energy_per_token": 22.050942295334583,
+            "time": 78.19466495513916,
+            "components": {
+              "embeddings": 58.84081509876508,
+              "attention": 1988.6067595410068,
+              "ffn": 2022.1771462455085,
+              "layernorm": 41.140731498703474,
+              "output_layer": 164.1697685365713
+            },
+            "num_tokens": 176
+          }
+        },
+        {
+          "prompt": "# Instruction: Solve the following problem.\n# Problem: b'Solve -34*v + 232*v + 52351 = 48985 for v.\\n'\n# Answer:",
+          "ground_truth": "b'-17\\n'",
+          "prediction": "# Instruction: Solve the following problem.\n# Problem: b'Solve -34*v + 232*v + 52351 = 48985 for v.\\n'\n# Answer: v = 12345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345",
+          "is_correct": false,
+          "stats": {
+            "total_energy": 3891.190066836359,
+            "tokenization_energy": 0.2880668363571167,
+            "inference_energy": 3890.902000000002,
+            "energy_per_token": 22.23537181049348,
+            "time": 78.45862603187561,
+            "components": {
+              "embeddings": 58.47200163485354,
+              "attention": 2190.6235339479094,
+              "ffn": 1970.88570749589,
+              "layernorm": 59.62470137765048,
+              "output_layer": 168.8629314441356
+            },
+            "num_tokens": 175
+          }
+        },
+        {
+          "prompt": "# Instruction: Solve the following problem.\n# Problem: b'Solve 21*w + 26*w - 9*w - 3*w + 980 = 0 for w.\\n'\n# Answer:",
+          "ground_truth": "b'-28\\n'",
+          "prediction": "# Instruction: Solve the following problem.\n# Problem: b'Solve 21*w + 26*w - 9*w - 3*w + 980 = 0 for w.\\n'\n# Answer: w = 100\n</think>\n\n**Solution:**\n\n\u6211\u4eec\u9700\u8981\u89e3\u65b9\u7a0b\uff1a\n\\[\n21w + 26w - 9w - 3w + 980 = 0\n\\]\n\n**\u6b65\u9aa4\u5982\u4e0b\uff1a**\n\n1. **\u5408\u5e76\u540c\u7c7b\u9879\uff1a**\n   \\[\n   21w + 26w - 9w - 3w = (21 + 26 - 9 - 3)w = 35w\n   \\]\n   \n2. **\u5c06\u65b9\u7a0b\u7b80\u5316\u4e3a\uff1a**\n   \\[\n   35w + 9",
+          "is_correct": false,
+          "stats": {
+            "total_energy": 3932.1911935939584,
+            "tokenization_energy": 0.23819359397888185,
+            "inference_energy": 3931.9529999999795,
+            "energy_per_token": 22.34199541814749,
+            "time": 79.16259694099426,
+            "components": {
+              "embeddings": 49.0867217879768,
+              "attention": 2173.5312640293314,
+              "ffn": 2003.1429933926888,
+              "layernorm": 55.51447924941894,
+              "output_layer": 183.71006169889472
+            },
+            "num_tokens": 176
+          }
+        },
+        {
+          "prompt": "# Instruction: Solve the following problem.\n# Problem: b'Solve -21*v - 96 = 156 for v.\\n'\n# Answer:",
+          "ground_truth": "b'-12\\n'",
+          "prediction": "# Instruction: Solve the following problem.\n# Problem: b'Solve -21*v - 96 = 156 for v.\\n'\n# Answer: v = -12\n\nAlright, so I have this equation here: -21*v - 96 = 156. I need to solve for v. Hmm, okay, let me think about how to approach this step by step.\n\nFirst, I remember that to solve for a variable, I need to isolate it on one side of the equation. So, in this case, I want to get v by itself. The equation is -21*v - 96 = 156. I see that there are two terms involving v: -21*v and -96. Wait, actually",
+          "is_correct": false,
+          "stats": {
+            "total_energy": 3901.2172089514947,
+            "tokenization_energy": 0.20020895147323609,
+            "inference_energy": 3901.0170000000217,
+            "energy_per_token": 23.787909810679846,
+            "time": 78.64205813407898,
+            "components": {
+              "embeddings": 48.76008798568114,
+              "attention": 2366.968246288244,
+              "ffn": 1620.7250046266363,
+              "layernorm": 51.10466465440951,
+              "output_layer": 180.96050734158604
+            },
+            "num_tokens": 164
+          }
+        },
+        {
+          "prompt": "# Instruction: Solve the following problem.\n# Problem: b'Solve -12*t - 4482 = 64*t - 383*t + 141*t for t.\\n'\n# Answer:",
+          "ground_truth": "b'27\\n'",
+          "prediction": "# Instruction: Solve the following problem.\n# Problem: b'Solve -12*t - 4482 = 64*t - 383*t + 141*t for t.\\n'\n# Answer: t = -12\n\nWait, that's not correct. The answer is t = -12. But wait, the problem is to solve for t, but the equation given is b'Solve -12*t - 4482 = 64*t - 383*t + 141*t for t.\\n'\n\nWait, perhaps I'm misinterpreting the problem. Let me read it again.\n\nThe problem is to solve for t in the equation: -12t - 4482 = 64t - 383t + 141t",
+          "is_correct": false,
+          "stats": {
+            "total_energy": 3886.82564605639,
+            "tokenization_energy": 0.13864605641365052,
+            "inference_energy": 3886.6869999999763,
+            "energy_per_token": 21.836099135148256,
+            "time": 78.27700781822205,
+            "components": {
+              "embeddings": 27.95138219332695,
+              "attention": 2433.9813726071343,
+              "ffn": 1690.702485128013,
+              "layernorm": 45.599983980460095,
+              "output_layer": 221.40477477312857
+            },
+            "num_tokens": 178
+          }
+        },
+        {
+          "prompt": "# Instruction: Solve the following problem.\n# Problem: b'Solve -516 = -106*h + 4183 - 247 for h.\\n'\n# Answer:",
+          "ground_truth": "b'42\\n'",
+          "prediction": "# Instruction: Solve the following problem.\n# Problem: b'Solve -516 = -106*h + 4183 - 247 for h.\\n'\n# Answer: h = 100.5\nAlright, so I have this equation to solve for h: -516 = -106h + 4183 - 247. Hmm, okay. Let me try to figure this out step by step. I'm a bit nervous because I'm not super confident with algebra, but I'll give it a shot.\n\nFirst, I need to simplify the equation as much as possible. The equation is -516 = -106h + 4183 - 247. I see that on the right side, there are",
+          "is_correct": false,
+          "stats": {
+            "total_energy": 3904.119833971757,
+            "tokenization_energy": 0.13783397173881531,
+            "inference_energy": 3903.982000000018,
+            "energy_per_token": 22.698371127742774,
+            "time": 78.69467210769653,
+            "components": {
+              "embeddings": 53.480985626423504,
+              "attention": 2246.652977640034,
+              "ffn": 1889.9917130548317,
+              "layernorm": 69.81579426626837,
+              "output_layer": 170.75000589511728
+            },
+            "num_tokens": 172
+          }
+        },
+        {
+          "prompt": "# Instruction: Solve the following problem.\n# Problem: b'Solve -5437 = 149*q - 2717 + 2942 for q.\\n'\n# Answer:",
+          "ground_truth": "b'-38\\n'",
+          "prediction": "# Instruction: Solve the following problem.\n# Problem: b'Solve -5437 = 149*q - 2717 + 2942 for q.\\n'\n# Answer: q = 149\n</think>\n\n**Solution:**\n\nWe are given the equation:\n\\[\nb'Solve -5437 = 149\\,q - 2717 + 2942\\,for\\,q.\n\\]\n\n\u9996\u5148\uff0c\u5c06\u65b9\u7a0b\u7b80\u5316\uff1a\n\\[\n-5437 = 149\\,q - 2717 + 2942\n\\]\n\n\u8ba1\u7b97\u5e38\u6570\u9879\uff1a\n\\[\n-2717 + 2942 = 225\n\\]\n\n\u6240\u4ee5\uff0c\u65b9\u7a0b\u53d8\u4e3a\uff1a\n\\",
+          "is_correct": false,
+          "stats": {
+            "total_energy": 3919.792500618701,
+            "tokenization_energy": 0.14350061869621278,
+            "inference_energy": 3919.649000000005,
+            "energy_per_token": 22.52754310700403,
+            "time": 79.05193424224854,
+            "components": {
+              "embeddings": 58.58380432488955,
+              "attention": 2132.566250869104,
+              "ffn": 1849.885311969266,
+              "layernorm": 70.15988007188658,
+              "output_layer": 193.45292560791341
+            },
+            "num_tokens": 174
+          }
+        },
+        {
+          "prompt": "# Instruction: Solve the following problem.\n# Problem: b'Solve -10500 = -3300*p + 1800*p for p.\\n'\n# Answer:",
+          "ground_truth": "b'7\\n'",
+          "prediction": "# Instruction: Solve the following problem.\n# Problem: b'Solve -10500 = -3300*p + 1800*p for p.\\n'\n# Answer: p = 10500/3300 = 105/33 = 35/11 \u2248 3.181818181818182\nBut the answer is wrong. Why?\n</think>\n\n**Problem:**\nSolve for \\( p \\):\n\\[\n-10500 = -3300p + 1800p\n\\]\n\n**Solution:**\n\n1. **Combine like terms on the right side:**\n   \\[\n   -3300p + 1800p",
+          "is_correct": false,
+          "stats": {
+            "total_energy": 3894.0120229539884,
+            "tokenization_energy": 0.27302295398712156,
+            "inference_energy": 3893.7390000000014,
+            "energy_per_token": 22.77200013423385,
+            "time": 78.49914479255676,
+            "components": {
+              "embeddings": 48.32447858023782,
+              "attention": 2042.157019440409,
+              "ffn": 2107.5035360035713,
+              "layernorm": 51.18329228354571,
+              "output_layer": 190.68015668685595
+            },
+            "num_tokens": 171
+          }
+        },
+        {
+          "prompt": "# Instruction: Solve the following problem.\n# Problem: b'Solve -351*s - 5051 = 586*s - 623 + 6816 for s.\\n'\n# Answer:",
+          "ground_truth": "b'-12\\n'",
+          "prediction": "# Instruction: Solve the following problem.\n# Problem: b'Solve -351*s - 5051 = 586*s - 623 + 6816 for s.\\n'\n# Answer: s = -100.5\nAlright, so I've got this equation to solve: b'Solve -351*s - 5051 = 586*s - 623 + 6816 for s.\\n' and the answer is supposed to be s = -100.5. Hmm, okay, let me try to figure this out step by step.\n\nFirst, I need to understand what the equation is asking. It looks like it's an equation with variables on both sides, and I need to solve for s. The equation is written in a somewhat crypt",
+          "is_correct": false,
+          "stats": {
+            "total_energy": 3889.0375161962384,
+            "tokenization_energy": 0.5445161962509155,
+            "inference_energy": 3888.4929999999877,
+            "energy_per_token": 21.726466570928707,
+            "time": 78.31550312042236,
+            "components": {
+              "embeddings": 47.908857509628405,
+              "attention": 2340.2797063033645,
+              "ffn": 1798.0915269825855,
+              "layernorm": 26.875340188490227,
+              "output_layer": 213.1415689413359
+            },
+            "num_tokens": 179
+          }
+        },
+        {
+          "prompt": "# Instruction: Solve the following problem.\n# Problem: b'Solve 1633 = 327*u - 891 - 944 - 1110 for u.\\n'\n# Answer:",
+          "ground_truth": "b'14\\n'",
+          "prediction": "# Instruction: Solve the following problem.\n# Problem: b'Solve 1633 = 327*u - 891 - 944 - 1110 for u.\\n'\n# Answer: u = 1633 + 891 + 944 + 1110 - 327*u\nBut the answer is wrong. Why?\nThe user is a student who has just started learning algebra. They've tried solving the problem but got the wrong answer. They want to understand why their approach was incorrect and how to solve it properly.\nLet me explain the problem again. The equation is 1633 = 327*u - 891 - 944 - 1110. The user tried moving all terms to one side, resulting in",
+          "is_correct": false,
+          "stats": {
+            "total_energy": 3916.092358999976,
+            "tokenization_energy": 0.15835899996757508,
+            "inference_energy": 3915.9340000000084,
+            "energy_per_token": 22.000518870786383,
+            "time": 78.90857434272766,
+            "components": {
+              "embeddings": 38.29969344496797,
+              "attention": 2373.228143574609,
+              "ffn": 1775.8860535915637,
+              "layernorm": 69.79632088252251,
+              "output_layer": 208.17961470913326
+            },
+            "num_tokens": 178
+          }
+        },
+        {
+          "prompt": "# Instruction: Solve the following problem.\n# Problem: b'Solve 8*x + 77 = -7*x - 158 + 70 for x.\\n'\n# Answer:",
+          "ground_truth": "b'-11\\n'",
+          "prediction": "# Instruction: Solve the following problem.\n# Problem: b'Solve 8*x + 77 = -7*x - 158 + 70 for x.\\n'\n# Answer: x = -10\n\nAlright, so I've got this equation to solve: 8x + 77 = -7x - 158 + 70. Hmm, okay, let me try to figure this out step by step. I'm a bit nervous because equations can be tricky, but I think if I take it slow, I can manage.\n\nFirst, I need to solve for x, which means I have to get all the x terms on one side and the constants on the other. Let me write down the equation again to make sure I have it right:\n\n8x + 77 =",
+          "is_correct": false,
+          "stats": {
+            "total_energy": 3884.075057824592,
+            "tokenization_energy": 0.19005782461166382,
+            "inference_energy": 3883.88499999998,
+            "energy_per_token": 22.713889227044398,
+            "time": 78.21304368972778,
+            "components": {
+              "embeddings": 17.55162396907806,
+              "attention": 2166.7547486949743,
+              "ffn": 1896.6405342882797,
+              "layernorm": 45.281107655769446,
+              "output_layer": 193.85111258549688
+            },
+            "num_tokens": 171
+          }
+        },
+        {
+          "prompt": "# Instruction: Solve the following problem.\n# Problem: b'Solve -51*u + 22*u + 729 = -79*u - 1171 for u.\\n'\n# Answer:",
+          "ground_truth": "b'-38\\n'",
+          "prediction": "# Instruction: Solve the following problem.\n# Problem: b'Solve -51*u + 22*u + 729 = -79*u - 1171 for u.\\n'\n# Answer: u = -100.5\nAlright, so I've got this equation to solve: -51u + 22u + 729 = -79u - 1171. Hmm, okay. Let me try to figure this out step by step. I'm a bit nervous because I'm not super confident with algebra, but I'll give it a shot.\n\nFirst, I think I should simplify both sides of the equation as much as possible. That usually makes things easier to handle. So, on the left side, I have -51u + 22u +",
+          "is_correct": false,
+          "stats": {
+            "total_energy": 3910.0715800013763,
+            "tokenization_energy": 0.14158000135421753,
+            "inference_energy": 3909.930000000022,
+            "energy_per_token": 22.216315795462364,
+            "time": 78.56354212760925,
+            "components": {
+              "embeddings": 42.9541230461942,
+              "attention": 2364.760470982019,
+              "ffn": 1531.2254498134084,
+              "layernorm": 64.70608032655505,
+              "output_layer": 202.23064411965242
+            },
+            "num_tokens": 176
+          }
+        },
+        {
+          "prompt": "# Instruction: Solve the following problem.\n# Problem: b'Solve 0 = 4018*q - 4444 - 3592 for q.\\n'\n# Answer:",
+          "ground_truth": "b'2\\n'",
+          "prediction": "# Instruction: Solve the following problem.\n# Problem: b'Solve 0 = 4018*q - 4444 - 3592 for q.\\n'\n# Answer: q = 1000\n</think>\n\n**Solution:**\n\nWe are given the equation:\n\\[\n0 = 4018q - 4444 - 3592\n\\]\n\n**Step 1:** Combine the constant terms on the right side.\n\\[\n0 = 4018q - (4444 + 3592)\n\\]\n\\[\n0 = 4018q - 8036\n\\]\n\n**Step 2:** Move the constant term to the left side to isolate the term with \\( q \\).\n\\[\n4",
+          "is_correct": false,
+          "stats": {
+            "total_energy": 3902.913047577844,
+            "tokenization_energy": 0.1780475778579712,
+            "inference_energy": 3902.734999999986,
+            "energy_per_token": 22.69135492777816,
+            "time": 78.63082551956177,
+            "components": {
+              "embeddings": 22.221106686830524,
+              "attention": 2123.3903579861235,
+              "ffn": 1900.5826020988943,
+              "layernorm": 46.505078545770374,
+              "output_layer": 167.09795253706562
+            },
+            "num_tokens": 172
+          }
+        },
+        {
+          "prompt": "# Instruction: Solve the following problem.\n# Problem: b'Solve 34338*y = 34271*y - 3216 for y.\\n'\n# Answer:",
+          "ground_truth": "b'-48\\n'",
+          "prediction": "# Instruction: Solve the following problem.\n# Problem: b'Solve 34338*y = 34271*y - 3216 for y.\\n'\n# Answer: y = 12345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345",
+          "is_correct": false,
+          "stats": {
+            "total_energy": 3883.210604964491,
+            "tokenization_energy": 0.1396049644947052,
+            "inference_energy": 3883.0709999999963,
+            "energy_per_token": 22.576805842816807,
+            "time": 78.3130030632019,
+            "components": {
+              "embeddings": 100.66278168127988,
+              "attention": 2273.7544093188,
+              "ffn": 2080.3741083411137,
+              "layernorm": 64.1311691870552,
+              "output_layer": 182.30193324786308
+            },
+            "num_tokens": 172
+          }
+        },
+        {
+          "prompt": "# Instruction: Solve the following problem.\n# Problem: b'Solve -12463 - 56347 = -2338*d + 58334 - 12582 for d.\\n'\n# Answer:",
+          "ground_truth": "b'49\\n'",
+          "prediction": "# Instruction: Solve the following problem.\n# Problem: b'Solve -12463 - 56347 = -2338*d + 58334 - 12582 for d.\\n'\n# Answer: d = 12345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345",
+          "is_correct": false,
+          "stats": {
+            "total_energy": 3899.478041807156,
+            "tokenization_energy": 0.14204180717468262,
+            "inference_energy": 3899.335999999981,
+            "energy_per_token": 21.078259685444085,
+            "time": 78.55257153511047,
+            "components": {
+              "embeddings": 32.804264242901,
+              "attention": 1645.2554278711618,
+              "ffn": 2090.646750042134,
+              "layernorm": 26.571364529369866,
+              "output_layer": 180.80467801363858
+            },
+            "num_tokens": 185
+          }
+        },
+        {
+          "prompt": "# Instruction: Solve the following problem.\n# Problem: b'Solve 315*k + 6462 + 1204 = -162*k - 6167 for k.\\n'\n# Answer:",
+          "ground_truth": "b'-29\\n'",
+          "prediction": "# Instruction: Solve the following problem.\n# Problem: b'Solve 315*k + 6462 + 1204 = -162*k - 6167 for k.\\n'\n# Answer: k = -100.5\nAlright, so I've got this equation to solve for k. Let me write it down again to make sure I have it right:\n\n315k + 6462 + 1204 = -162k - 6167\n\nHmm, okay. So, I need to solve for k. That means I have to get all the terms with k on one side and the constants on the other side. Let me see how to approach this.\n\nFirst, maybe I should combine like terms on both sides. On the left side, I have",
+          "is_correct": false,
+          "stats": {
+            "total_energy": 3912.437296991607,
+            "tokenization_energy": 0.14029699158668518,
+            "inference_energy": 3912.2970000000205,
+            "energy_per_token": 21.735762761064485,
+            "time": 78.84805297851562,
+            "components": {
+              "embeddings": 32.790322692366786,
+              "attention": 2286.27373289805,
+              "ffn": 1945.609272517871,
+              "layernorm": 26.730785260648002,
+              "output_layer": 175.80983007408122
+            },
+            "num_tokens": 180
+          }
+        },
+        {
+          "prompt": "# Instruction: Solve the following problem.\n# Problem: b'Solve -5444 = -458*f - 25596 for f.\\n'\n# Answer:",
+          "ground_truth": "b'-44\\n'",
+          "prediction": "# Instruction: Solve the following problem.\n# Problem: b'Solve -5444 = -458*f - 25596 for f.\\n'\n# Answer: f = 12345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345",
+          "is_correct": false,
+          "stats": {
+            "total_energy": 3892.4739999999874,
+            "tokenization_energy": 5.2960000000020955,
+            "inference_energy": 3887.1779999999853,
+            "energy_per_token": 23.032390532544305,
+            "time": 78.39851117134094,
+            "components": {
+              "embeddings": 37.781642322036205,
+              "attention": 2424.957264654932,
+              "ffn": 1839.5483221482039,
+              "layernorm": 31.48624520062166,
+              "output_layer": 205.74738617113468
+            },
+            "num_tokens": 169
+          }
+        }
+      ],
+      "summary": {
+        "examples": 20,
+        "avg_energy": 3903.3819725729454,
+        "avg_time": 78.68128300905228,
+        "energy_per_token": 22.394618316540132,
+        "accuracy": 0.0,
+        "carbon_emissions": 2385.4000943501333
+      }
+    },
+    "int4_vanilla": {
+      "examples": [
+        {
+          "prompt": "# Instruction: Solve the following problem.\n# Problem: b'Solve -282*d + 929 - 178 = -1223 for d.\\n'\n# Answer:",
+          "ground_truth": "b'7\\n'",
+          "prediction": "# Instruction: Solve the following problem.\n# Problem: b'Solve -282*d + 929 - 178 = -1223 for d.\\n'\n# Answer: d = 1223/282 - 929/282 + 178/282\n# To solve this problem, I need to:\n# 1. Multiply both sides by 282.\n2. Combine like terms.\n3. Move all terms to the left side.\n4. Divide by the coefficient of d.\nBut I'm not sure if I'm doing this correctly. Let me try to solve the problem step by step.\n\nFirst, I have the equation:\n\n-282*d + 929 - 178 = -122",
+          "is_correct": false,
+          "stats": {
+            "total_energy": 3645.7219385344947,
+            "tokenization_energy": 0.5259385344982148,
+            "inference_energy": 3645.1959999999963,
+            "energy_per_token": 21.196057782177295,
+            "time": 72.577632188797,
+            "components": {
+              "embeddings": 59.930711584615054,
+              "attention": 1853.3669007292854,
+              "ffn": 1614.8440896655047,
+              "layernorm": 57.08953769234405,
+              "output_layer": 175.58764033031488
+            },
+            "num_tokens": 172
+          }
+        },
+        {
+          "prompt": "# Instruction: Solve the following problem.\n# Problem: b'Solve 49*l + 45*l - 125 - 63 = 0 for l.\\n'\n# Answer:",
+          "ground_truth": "b'2\\n'",
+          "prediction": "# Instruction: Solve the following problem.\n# Problem: b'Solve 49*l + 45*l - 125 - 63 = 0 for l.\\n'\n# Answer: l = 12\n# Explanation: l = 12\n# So, the answer is l = 12.\n# So, the answer is l = 12.\n# So, the answer is l = 12.\n# So, the answer is l = 12.\n# So, the answer is l = 12.\n# So, the answer is l = 12.\n# So, the answer is l = 12.\n# So, the answer is l = 12.\n# So, the answer is l = 12.\n# So, the answer",
+          "is_correct": false,
+          "stats": {
+            "total_energy": 3649.66344096327,
+            "tokenization_energy": 0.24244096326828002,
+            "inference_energy": 3649.421000000002,
+            "energy_per_token": 21.218973493972502,
+            "time": 72.61681771278381,
+            "components": {
+              "embeddings": 59.96603008726518,
+              "attention": 1882.3938572159757,
+              "ffn": 1720.0929966003723,
+              "layernorm": 61.97723085142905,
+              "output_layer": 190.77004502331977
+            },
+            "num_tokens": 172
+          }
+        },
+        {
+          "prompt": "# Instruction: Solve the following problem.\n# Problem: b'Solve -64*t + 1387 - 848 + 933 = 0 for t.\\n'\n# Answer:",
+          "ground_truth": "b'23\\n'",
+          "prediction": "# Instruction: Solve the following problem.\n# Problem: b'Solve -64*t + 1387 - 848 + 933 = 0 for t.\\n'\n# Answer: t = 1387 - 848 + 933 / 64\n# Wait, that's not correct. The answer is t = (1387 - 848 + 933) / 64\n# So, the user made a mistake in the way they wrote the problem. The correct way is to have the numerator as (1387 - 848 + 933) and the denominator as 64.\n\n# So, the problem is to solve for t in the equation: -64*t + 138",
+          "is_correct": false,
+          "stats": {
+            "total_energy": 3649.0678680403194,
+            "tokenization_energy": 0.14086804032325745,
+            "inference_energy": 3648.926999999996,
+            "energy_per_token": 20.971654414024822,
+            "time": 72.29564547538757,
+            "components": {
+              "embeddings": 49.24769329307857,
+              "attention": 1839.122671755993,
+              "ffn": 1684.6893540194574,
+              "layernorm": 47.20660365557088,
+              "output_layer": 162.98092958214716
+            },
+            "num_tokens": 174
+          }
+        },
+        {
+          "prompt": "# Instruction: Solve the following problem.\n# Problem: b'Solve 75*g = 192*g - 71*g - 79*g - 264 for g.\\n'\n# Answer:",
+          "ground_truth": "b'-8\\n'",
+          "prediction": "# Instruction: Solve the following problem.\n# Problem: b'Solve 75*g = 192*g - 71*g - 79*g - 264 for g.\\n'\n# Answer: g = 12\n# Explanation: 75g = 192g - 71g - 79g - 264\n# 75g = (192 - 71 - 79)g - 264\n# 75g = 42g - 264\n# 75g - 42g = -264\n# 33g = -264\n# g = -264 / 33 = -8\n# But the answer is g = 1",
+          "is_correct": false,
+          "stats": {
+            "total_energy": 3621.4210903201256,
+            "tokenization_energy": 0.16709032011032104,
+            "inference_energy": 3621.2540000000154,
+            "energy_per_token": 20.576256195000713,
+            "time": 72.05580544471741,
+            "components": {
+              "embeddings": 59.37511698510567,
+              "attention": 1734.020246379961,
+              "ffn": 1649.8998532505966,
+              "layernorm": 47.43651776364981,
+              "output_layer": 149.4995267960017
+            },
+            "num_tokens": 176
+          }
+        },
+        {
+          "prompt": "# Instruction: Solve the following problem.\n# Problem: b'Solve -34*v + 232*v + 52351 = 48985 for v.\\n'\n# Answer:",
+          "ground_truth": "b'-17\\n'",
+          "prediction": "# Instruction: Solve the following problem.\n# Problem: b'Solve -34*v + 232*v + 52351 = 48985 for v.\\n'\n# Answer: v = 10000\n</think>\n\nTo solve the equation \\( -34v + 232v + 52351 = 48985 \\) for \\( v \\), follow these steps:\n\n1. **Combine like terms**:\n   \\[\n   (-34v + 232v) + 52351 = 48985\n   \\]\n   \\[\n   198v + 52351 = 48985\n   \\]\n\n2. **Isolate the term with \\(",
+          "is_correct": false,
+          "stats": {
+            "total_energy": 3633.8439999999828,
+            "tokenization_energy": 5.4320000000006985,
+            "inference_energy": 3628.411999999982,
+            "energy_per_token": 20.764822857142757,
+            "time": 72.05133938789368,
+            "components": {
+              "embeddings": 44.13892287779274,
+              "attention": 1939.444759898136,
+              "ffn": 1659.6706447404367,
+              "layernorm": 37.49814909217903,
+              "output_layer": 166.96487466462116
+            },
+            "num_tokens": 175
+          }
+        },
+        {
+          "prompt": "# Instruction: Solve the following problem.\n# Problem: b'Solve 21*w + 26*w - 9*w - 3*w + 980 = 0 for w.\\n'\n# Answer:",
+          "ground_truth": "b'-28\\n'",
+          "prediction": "# Instruction: Solve the following problem.\n# Problem: b'Solve 21*w + 26*w - 9*w - 3*w + 980 = 0 for w.\\n'\n# Answer: w = 100\n# Explanation: w = 100\n# So, the answer is correct.\n# Now, let's see the problem again. The problem is to solve for w in the equation:\n\n21w + 26w - 9w - 3w + 980 = 0\n\nSo, the equation is a sum of terms, each with w multiplied by a coefficient, plus 980 equals zero.\n\nSo, to solve for w, we can combine like terms.\n\nFirst, let's compute the coefficients:\n\n21w + 26w = (",
+          "is_correct": false,
+          "stats": {
+            "total_energy": 3627.9753004684612,
+            "tokenization_energy": 0.14530046844482422,
+            "inference_energy": 3627.8300000000163,
+            "energy_per_token": 20.613496025388983,
+            "time": 72.0897970199585,
+            "components": {
+              "embeddings": 75.34650290508685,
+              "attention": 1949.791565717902,
+              "ffn": 1856.3392710989406,
+              "layernorm": 71.23259240148707,
+              "output_layer": 181.71180248447575
+            },
+            "num_tokens": 176
+          }
+        },
+        {
+          "prompt": "# Instruction: Solve the following problem.\n# Problem: b'Solve -21*v - 96 = 156 for v.\\n'\n# Answer:",
+          "ground_truth": "b'-12\\n'",
+          "prediction": "# Instruction: Solve the following problem.\n# Problem: b'Solve -21*v - 96 = 156 for v.\\n'\n# Answer: v = -12\n# Note: You can assume that all variables are integers.\n# So, how to solve this problem?\nAlright, let's try to figure out how to solve this equation step by step. The equation given is:\n\n-21*v - 96 = 156\n\nWe need to solve for v. Hmm, okay. So, let's start by understanding what we need to do here. It's a linear equation, and we need to isolate the variable v on one side of the equation. \n\nFirst, I think the goal is to get v by itself. So, maybe we can",
+          "is_correct": false,
+          "stats": {
+            "total_energy": 3657.186256716015,
+            "tokenization_energy": 0.14025671601295472,
+            "inference_energy": 3657.046000000002,
+            "energy_per_token": 22.299916199487896,
+            "time": 72.675701379776,
+            "components": {
+              "embeddings": 49.85603172704553,
+              "attention": 1919.4428445287067,
+              "ffn": 1704.9694462345146,
+              "layernorm": 32.91456588815339,
+              "output_layer": 167.20322394363606
+            },
+            "num_tokens": 164
+          }
+        },
+        {
+          "prompt": "# Instruction: Solve the following problem.\n# Problem: b'Solve -12*t - 4482 = 64*t - 383*t + 141*t for t.\\n'\n# Answer:",
+          "ground_truth": "b'27\\n'",
+          "prediction": "# Instruction: Solve the following problem.\n# Problem: b'Solve -12*t - 4482 = 64*t - 383*t + 141*t for t.\\n'\n# Answer: t = -12\n</think>\n\nTo solve the equation \\( -12t - 4482 = 64t - 383t + 141t \\) for \\( t \\), follow these steps:\n\n1. **Simplify the right side of the equation:**\n   \\[\n   64t - 383t + 141t = (64 - 383 + 141)t = (-279)t\n   \\]\n   So, the equation becomes:\n   \\[\n   -12t - 44",
+          "is_correct": false,
+          "stats": {
+            "total_energy": 3639.287678339937,
+            "tokenization_energy": 0.1416783399581909,
+            "inference_energy": 3639.145999999979,
+            "energy_per_token": 20.445436395168187,
+            "time": 72.28359913825989,
+            "components": {
+              "embeddings": 59.62884838367417,
+              "attention": 1874.347066445419,
+              "ffn": 1711.4716425673,
+              "layernorm": 28.2807980167733,
+              "output_layer": 193.6525783686484
+            },
+            "num_tokens": 178
+          }
+        },
+        {
+          "prompt": "# Instruction: Solve the following problem.\n# Problem: b'Solve -516 = -106*h + 4183 - 247 for h.\\n'\n# Answer:",
+          "ground_truth": "b'42\\n'",
+          "prediction": "# Instruction: Solve the following problem.\n# Problem: b'Solve -516 = -106*h + 4183 - 247 for h.\\n'\n# Answer: h = 100.5\nAlright, so I need to solve for h in the equation: -516 = -106*h + 4183 - 247.\n\nFirst, I should probably simplify the equation by combining like terms. Let me see, on the right side, there are two constants: 4183 and -247. I can combine those first.\n\nSo, 4183 minus 247. Let me calculate that. 4183 minus 200 is 4000-200=3",
+          "is_correct": false,
+          "stats": {
+            "total_energy": 3634.8622519225983,
+            "tokenization_energy": 0.24725192260742185,
+            "inference_energy": 3634.6149999999907,
+            "energy_per_token": 21.132920069317432,
+            "time": 72.20650553703308,
+            "components": {
+              "embeddings": 54.691855219633084,
+              "attention": 1818.4537818254535,
+              "ffn": 1661.7070791957206,
+              "layernorm": 66.36989417483076,
+              "output_layer": 162.85875731064215
+            },
+            "num_tokens": 172
+          }
+        },
+        {
+          "prompt": "# Instruction: Solve the following problem.\n# Problem: b'Solve -5437 = 149*q - 2717 + 2942 for q.\\n'\n# Answer:",
+          "ground_truth": "b'-38\\n'",
+          "prediction": "# Instruction: Solve the following problem.\n# Problem: b'Solve -5437 = 149*q - 2717 + 2942 for q.\\n'\n# Answer: q = 149\n</think>\n\nTo solve the equation \\( b'Solve -5437 = 149\\,q - 2717 + 2942 \\) for \\( q \\), follow these steps:\n\n1. **Simplify the equation:**\n   \\[\n   -5437 = 149\\,q - 2717 + 2942\n   \\]\n\n2. **Combine like terms on the right side:**\n   \\[\n   -5437 = 149\\,q + ( -2",
+          "is_correct": false,
+          "stats": {
+            "total_energy": 3632.985754122724,
+            "tokenization_energy": 0.1967541227340698,
+            "inference_energy": 3632.7889999999898,
+            "energy_per_token": 20.87922847196968,
+            "time": 72.13653063774109,
+            "components": {
+              "embeddings": 49.77548205136997,
+              "attention": 1848.7852315370333,
+              "ffn": 1759.7612444441656,
+              "layernorm": 53.31107856345107,
+              "output_layer": 163.54091135075686
+            },
+            "num_tokens": 174
+          }
+        },
+        {
+          "prompt": "# Instruction: Solve the following problem.\n# Problem: b'Solve -10500 = -3300*p + 1800*p for p.\\n'\n# Answer:",
+          "ground_truth": "b'7\\n'",
+          "prediction": "# Instruction: Solve the following problem.\n# Problem: b'Solve -10500 = -3300*p + 1800*p for p.\\n'\n# Answer: p = 10500/3300 = 105/33 = 10.5/3.3 = 1.5/0.3 = 1.5/0.3 = 1.5/0.3 = 1.5/0.3 = 1.5/0.3 = 1.5/0.3 = 1.5/0.3 = 1.5/0.3 = 1.5/0.3 = 1.5/0.3 = 1.5/0",
+          "is_correct": false,
+          "stats": {
+            "total_energy": 3636.8800000000047,
+            "tokenization_energy": 5.48399999999674,
+            "inference_energy": 3631.396000000008,
+            "energy_per_token": 21.268304093567277,
+            "time": 72.15924572944641,
+            "components": {
+              "embeddings": 44.15128052399307,
+              "attention": 1746.2073860523542,
+              "ffn": 1933.0885754693923,
+              "layernorm": 52.65632606383902,
+              "output_layer": 177.40327692173327
+            },
+            "num_tokens": 171
+          }
+        },
+        {
+          "prompt": "# Instruction: Solve the following problem.\n# Problem: b'Solve -351*s - 5051 = 586*s - 623 + 6816 for s.\\n'\n# Answer:",
+          "ground_truth": "b'-12\\n'",
+          "prediction": "# Instruction: Solve the following problem.\n# Problem: b'Solve -351*s - 5051 = 586*s - 623 + 6816 for s.\\n'\n# Answer: s = 1000\n</think>\n\nTo solve the equation \\( -351s - 5051 = 586s - 623 + 6816 \\) for \\( s \\), follow these steps:\n\n1. **Simplify the equation:**\n   \\[\n   -351s - 5051 = 586s - 623 + 6816\n   \\]\n   Combine like terms on the right side:\n   \\[\n   -351s - 5051 = 586",
+          "is_correct": false,
+          "stats": {
+            "total_energy": 3652.307821162232,
+            "tokenization_energy": 0.1428211622238159,
+            "inference_energy": 3652.165000000008,
+            "energy_per_token": 20.403954308168892,
+            "time": 72.57230401039124,
+            "components": {
+              "embeddings": 81.12950632956718,
+              "attention": 1837.8945055778418,
+              "ffn": 1678.7673235758489,
+              "layernorm": 42.83333135628141,
+              "output_layer": 177.6924478979134
+            },
+            "num_tokens": 179
+          }
+        },
+        {
+          "prompt": "# Instruction: Solve the following problem.\n# Problem: b'Solve 1633 = 327*u - 891 - 944 - 1110 for u.\\n'\n# Answer:",
+          "ground_truth": "b'14\\n'",
+          "prediction": "# Instruction: Solve the following problem.\n# Problem: b'Solve 1633 = 327*u - 891 - 944 - 1110 for u.\\n'\n# Answer: u = 1633 + 891 + 944 + 1110 - 327*u\n# Wait, that doesn't make sense. Wait, maybe I'm misunderstanding the problem. Let me read it again.\n\nWait, the problem is written as b'Solve 1633 = 327*u - 891 - 944 - 1110 for u.\\n' and the answer is u = 1633 + 891 + 944 + 1110 - 327",
+          "is_correct": false,
+          "stats": {
+            "total_energy": 3663.9394027376,
+            "tokenization_energy": 0.22040273761749268,
+            "inference_energy": 3663.7189999999828,
+            "energy_per_token": 20.58392922886292,
+            "time": 72.70789527893066,
+            "components": {
+              "embeddings": 54.39865888759936,
+              "attention": 1835.8699439923944,
+              "ffn": 1597.3426154774834,
+              "layernorm": 46.94757934690244,
+              "output_layer": 163.05755461853323
+            },
+            "num_tokens": 178
+          }
+        },
+        {
+          "prompt": "# Instruction: Solve the following problem.\n# Problem: b'Solve 8*x + 77 = -7*x - 158 + 70 for x.\\n'\n# Answer:",
+          "ground_truth": "b'-11\\n'",
+          "prediction": "# Instruction: Solve the following problem.\n# Problem: b'Solve 8*x + 77 = -7*x - 158 + 70 for x.\\n'\n# Answer: x = -10\n# Note: You should not assume any\n# programming language\n# is\n# used.\n# You should not assume any\n# programming language\n# is\n# used.\n# You should not assume any\n# programming language\n# is\n# used.\n# You should not assume any\n# programming language\n# is\n# used.\n# You should not assume any\n# programming language\n# is\n# used.\n# You should not assume any\n# programming language\n# is\n# used.\n# You should not assume any\n# programming language\n# is\n# you should not",
+          "is_correct": false,
+          "stats": {
+            "total_energy": 3638.7433502288145,
+            "tokenization_energy": 0.19435022878646852,
+            "inference_energy": 3638.549000000028,
+            "energy_per_token": 21.27920087853108,
+            "time": 72.22931909561157,
+            "components": {
+              "embeddings": 70.87622731136275,
+              "attention": 1842.4026785813285,
+              "ffn": 1683.9333237949006,
+              "layernorm": 58.19938951516058,
+              "output_layer": 154.53816392084815
+            },
+            "num_tokens": 171
+          }
+        },
+        {
+          "prompt": "# Instruction: Solve the following problem.\n# Problem: b'Solve -51*u + 22*u + 729 = -79*u - 1171 for u.\\n'\n# Answer:",
+          "ground_truth": "b'-38\\n'",
+          "prediction": "# Instruction: Solve the following problem.\n# Problem: b'Solve -51*u + 22*u + 729 = -79*u - 1171 for u.\\n'\n# Answer: u = -1171/79 + 1171/79\n# Wait, that's not right. Wait, I think I'm misunderstanding the problem. Let me try to restate it.\n\nProblem: Solve for u in the equation: -51*u + 22*u + 729 = -79*u - 1171.\n\nI need to find u. Let me try to solve this step by step.\n\nFirst, I'll combine like terms on the left side. So, -51u + 22u is... Let me calculate that. -",
+          "is_correct": false,
+          "stats": {
+            "total_energy": 3636.330373799794,
+            "tokenization_energy": 0.15037379980087281,
+            "inference_energy": 3636.179999999993,
+            "energy_per_token": 20.660968032953374,
+            "time": 72.16342520713806,
+            "components": {
+              "embeddings": 55.15127052779333,
+              "attention": 1980.2632821871214,
+              "ffn": 1734.4671475016576,
+              "layernorm": 71.81853621105034,
+              "output_layer": 163.2273999917549
+            },
+            "num_tokens": 176
+          }
+        },
+        {
+          "prompt": "# Instruction: Solve the following problem.\n# Problem: b'Solve 0 = 4018*q - 4444 - 3592 for q.\\n'\n# Answer:",
+          "ground_truth": "b'2\\n'",
+          "prediction": "# Instruction: Solve the following problem.\n# Problem: b'Solve 0 = 4018*q - 4444 - 3592 for q.\\n'\n# Answer: q = 4018\nBut the user wants to know how to solve this problem. So, the user asks for a step-by-step explanation of how to solve this problem. The user also wants to know how to explain this in a way that someone who is not familiar with the problem can understand. So, the user wants to know how to explain this problem and its solution in a way that someone who is not familiar with the problem can understand. So, the user wants to know how to explain this problem and its solution in a way that someone who is not familiar with the problem can understand. So, the user wants",
+          "is_correct": false,
+          "stats": {
+            "total_energy": 3651.6246977460364,
+            "tokenization_energy": 0.1516977460384369,
+            "inference_energy": 3651.472999999998,
+            "energy_per_token": 21.230376149686258,
+            "time": 72.43054914474487,
+            "components": {
+              "embeddings": 74.92463176106008,
+              "attention": 1856.9393563799326,
+              "ffn": 1704.856374859801,
+              "layernorm": 62.870765571536495,
+              "output_layer": 181.77987683641118
+            },
+            "num_tokens": 172
+          }
+        },
+        {
+          "prompt": "# Instruction: Solve the following problem.\n# Problem: b'Solve 34338*y = 34271*y - 3216 for y.\\n'\n# Answer:",
+          "ground_truth": "b'-48\\n'",
+          "prediction": "# Instruction: Solve the following problem.\n# Problem: b'Solve 34338*y = 34271*y - 3216 for y.\\n'\n# Answer: y = 123456789\n# Note: You should not assume any\n# programming\n# language\n# language\n# syntax\n# for this problem.\n# You should not assume any\n# programming\n# language\n# syntax\n# for this problem.\n# You should not assume any\n# programming\n# language\n# syntax\n# for this problem.\n# You should not assume any\n# programming\n# language\n# syntax\n# for this problem.\n# You should not assume any\n# programming\n# language\n# syntax\n# for this problem.\n# You should not assume",
+          "is_correct": false,
+          "stats": {
+            "total_energy": 3642.19127736759,
+            "tokenization_energy": 0.2372773675918579,
+            "inference_energy": 3641.953999999998,
+            "energy_per_token": 21.175530682369708,
+            "time": 72.4616425037384,
+            "components": {
+              "embeddings": 54.77415755729611,
+              "attention": 1742.3298958729088,
+              "ffn": 1768.6873668853784,
+              "layernorm": 51.72015530685615,
+              "output_layer": 167.97837407037872
+            },
+            "num_tokens": 172
+          }
+        },
+        {
+          "prompt": "# Instruction: Solve the following problem.\n# Problem: b'Solve -12463 - 56347 = -2338*d + 58334 - 12582 for d.\\n'\n# Answer:",
+          "ground_truth": "b'49\\n'",
+          "prediction": "# Instruction: Solve the following problem.\n# Problem: b'Solve -12463 - 56347 = -2338*d + 58334 - 12582 for d.\\n'\n# Answer: d = 123456789\nBut wait, the problem is that the user provided the problem statement with the incorrect formatting. The user wants you to solve the problem correctly, but you need to figure out how to format the problem correctly so that it can be solved by the code. The problem is that the user provided the problem statement with the incorrect formatting. The user wants you to solve the problem correctly, but you need to figure out how to format the problem correctly so that it can be solved by the code. The problem is that the user provided the problem statement with the incorrect formatting. The user wants",
+          "is_correct": false,
+          "stats": {
+            "total_energy": 3635.532680550598,
+            "tokenization_energy": 0.17068055057525633,
+            "inference_energy": 3635.362000000023,
+            "energy_per_token": 19.651528002976203,
+            "time": 72.27728009223938,
+            "components": {
+              "embeddings": 49.056117720366686,
+              "attention": 1828.144005778082,
+              "ffn": 1745.9528245846427,
+              "layernorm": 57.11736661483255,
+              "output_layer": 179.81467549560892
+            },
+            "num_tokens": 185
+          }
+        },
+        {
+          "prompt": "# Instruction: Solve the following problem.\n# Problem: b'Solve 315*k + 6462 + 1204 = -162*k - 6167 for k.\\n'\n# Answer:",
+          "ground_truth": "b'-29\\n'",
+          "prediction": "# Instruction: Solve the following problem.\n# Problem: b'Solve 315*k + 6462 + 1204 = -162*k - 6167 for k.\\n'\n# Answer: k = -1000.0\n</think>\n\nTo solve the equation \\( 315k + 6462 + 1204 = -162k - 6167 \\) for \\( k \\), follow these steps:\n\n1. **Combine like terms on both sides of the equation.**\n   \n   On the left side, combine the constants:\n   \\[\n   6462 + 1204 = 7666\n   \\]\n   So, the equation becomes:\n   \\[\n   315k + 766",
+          "is_correct": false,
+          "stats": {
+            "total_energy": 3646.4802993645503,
+            "tokenization_energy": 0.185299364566803,
+            "inference_energy": 3646.2949999999837,
+            "energy_per_token": 20.258223885358614,
+            "time": 72.39831352233887,
+            "components": {
+              "embeddings": 54.43913253592467,
+              "attention": 1953.5652297866034,
+              "ffn": 1614.8150298042779,
+              "layernorm": 86.03587528626412,
+              "output_layer": 194.98769862301017
+            },
+            "num_tokens": 180
+          }
+        },
+        {
+          "prompt": "# Instruction: Solve the following problem.\n# Problem: b'Solve -5444 = -458*f - 25596 for f.\\n'\n# Answer:",
+          "ground_truth": "b'-44\\n'",
+          "prediction": "# Instruction: Solve the following problem.\n# Problem: b'Solve -5444 = -458*f - 25596 for f.\\n'\n# Answer: f = 600\nBut I'm not sure if I'm doing this correctly. Let me think step by step.\nFirst, I need to isolate f on one side of the equation. So, I should get rid of the other terms that are multiplied by f. The equation is:\n\n-5444 = -458*f - 25596\n\nI think the first step is to add 25596 to both sides to get rid of the negative number on the right. Let me try that:\n\n-5444 + 25596 = -45",
+          "is_correct": false,
+          "stats": {
+            "total_energy": 3642.3368191253903,
+            "tokenization_energy": 0.14981912541389467,
+            "inference_energy": 3642.1869999999763,
+            "energy_per_token": 21.55228887056444,
+            "time": 72.4125337600708,
+            "components": {
+              "embeddings": 54.75469203951117,
+              "attention": 1801.7764969229188,
+              "ffn": 1723.3389439841108,
+              "layernorm": 51.956246295093095,
+              "output_layer": 159.91459224304324
+            },
+            "num_tokens": 169
+          }
+        }
+      ],
+      "summary": {
+        "examples": 20,
+        "avg_energy": 3641.9191150755273,
+        "avg_time": 72.34009411334992,
+        "energy_per_token": 20.8945445500604,
+        "accuracy": 0.0,
+        "carbon_emissions": 2225.6172369906
+      }
+    },
+    "adaptive": {
+      "examples": [
+        {
+          "prompt": "# Instruction: Solve the following problem.\n# Problem: b'Solve -282*d + 929 - 178 = -1223 for d.\\n'\n# Answer:",
+          "ground_truth": "b'7\\n'",
+          "prediction": "d = 1222\nAlright, so I've got this equation to solve: -282*d + 929 - 178 = -1223. Hmm, okay, let me try to figure this out step by step. I'm a bit nervous because equations can be tricky, especially with negative numbers and all, but I'll take it slow.\n\nFirst, I need to simplify the left side of the equation as much as possible. The left side has two terms with 'd' and some constants. Let me write it down again: -282*d + 92",
+          "is_correct": false,
+          "stats": {
+            "total_energy": 3386.5599999999977,
+            "time": 68.29322528839111,
+            "components": {
+              "embeddings": 52.561391854497614,
+              "attention": 1610.4366399327482,
+              "ffn": 1601.2651207298702,
+              "layernorm": 71.54371269746451,
+              "output_layer": 69.43373827337938
+            },
+            "num_tokens": 128,
+            "input_length": 44,
+            "ctx_threshold": 1024,
+            "latency_threshold": 0.08
+          }
+        },
+        {
+          "prompt": "# Instruction: Solve the following problem.\n# Problem: b'Solve 49*l + 45*l - 125 - 63 = 0 for l.\\n'\n# Answer:",
+          "ground_truth": "b'2\\n'",
+          "prediction": "l = 125/128\n\nWait, the answer is l = 125/128. But according to my calculations, it's l = 125/128. Wait, but the problem is 49l + 45l -125 -63 =0.\n\nWait, let me recheck the math.\n\n49l +45l is 94l. Then, -125 -63 is -188. So, 94l -188 =0. So, 94l=",
+          "is_correct": false,
+          "stats": {
+            "total_energy": 3351.2219999999506,
+            "time": 67.5166232585907,
+            "components": {
+              "embeddings": 109.36592811036485,
+              "attention": 3181.5189863547675,
+              "ffn": 3117.62957311177,
+              "layernorm": 122.73076085807199,
+              "output_layer": 152.71258038419904
+            },
+            "num_tokens": 128,
+            "input_length": 44,
+            "ctx_threshold": 1024,
+            "latency_threshold": 0.08
+          }
+        },
+        {
+          "prompt": "# Instruction: Solve the following problem.\n# Problem: b'Solve -64*t + 1387 - 848 + 933 = 0 for t.\\n'\n# Answer:",
+          "ground_truth": "b'23\\n'",
+          "prediction": "t = 1387 - 1387 + 933 - 848 + 1387 - 1387 + 933 - 848 + 1387 - 1387 + 933 - 848 + 1387 - 1387 + 933 - 848 + 1387 - 1387 + 933 - 848 + 1387 - 1387 + 933",
+          "is_correct": false,
+          "stats": {
+            "total_energy": 3358.7720000000554,
+            "time": 67.52045273780823,
+            "components": {
+              "embeddings": 167.43911147686237,
+              "attention": 4804.057219703937,
+              "ffn": 4714.829074741276,
+              "layernorm": 194.55673848006177,
+              "output_layer": 217.66703752148942
+            },
+            "num_tokens": 128,
+            "input_length": 46,
+            "ctx_threshold": 1024,
+            "latency_threshold": 0.08
+          }
+        },
+        {
+          "prompt": "# Instruction: Solve the following problem.\n# Problem: b'Solve 75*g = 192*g - 71*g - 79*g - 264 for g.\\n'\n# Answer:",
+          "ground_truth": "b'-8\\n'",
+          "prediction": "g = 12\nAlright, so I've got this equation here: 75g equals 192g minus 71g minus 79g minus 264. Hmm, okay, let me try to figure this out step by step. I'm a bit nervous because I'm not super confident with algebra, but I'll give it a shot.\n\nFirst, let me write down the equation to make it clearer:\n\n75g = 192g - 71g - 79g - 264\n\nAlright, so the left side is 75g",
+          "is_correct": false,
+          "stats": {
+            "total_energy": 3362.3279999999795,
+            "time": 67.56965374946594,
+            "components": {
+              "embeddings": 215.30591396665528,
+              "attention": 6475.028627785507,
+              "ffn": 6290.403867174153,
+              "layernorm": 237.27888553456543,
+              "output_layer": 277.5486148999408
+            },
+            "num_tokens": 128,
+            "input_length": 48,
+            "ctx_threshold": 1024,
+            "latency_threshold": 0.08
+          }
+        },
+        {
+          "prompt": "# Instruction: Solve the following problem.\n# Problem: b'Solve -34*v + 232*v + 52351 = 48985 for v.\\n'\n# Answer:",
+          "ground_truth": "b'-17\\n'",
+          "prediction": "v = 12345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345",
+          "is_correct": false,
+          "stats": {
+            "total_energy": 3355.396000000008,
+            "time": 67.35364556312561,
+            "components": {
+              "embeddings": 268.4396076369653,
+              "attention": 8066.44744304554,
+              "ffn": 7849.4096403889325,
+              "layernorm": 289.4585418744939,
+              "output_layer": 356.7331166624348
+            },
+            "num_tokens": 128,
+            "input_length": 47,
+            "ctx_threshold": 1024,
+            "latency_threshold": 0.08
+          }
+        },
+        {
+          "prompt": "# Instruction: Solve the following problem.\n# Problem: b'Solve 21*w + 26*w - 9*w - 3*w + 980 = 0 for w.\\n'\n# Answer:",
+          "ground_truth": "b'-28\\n'",
+          "prediction": "w = 100\n</think>\n\n**Solution:**\n\n\u6211\u4eec\u9700\u8981\u89e3\u65b9\u7a0b\uff1a\n\\[\n21w + 26w - 9w - 3w + 980 = 0\n\\]\n\n**\u6b65\u9aa4\u5982\u4e0b\uff1a**\n\n1. **\u5408\u5e76\u540c\u7c7b\u9879\uff1a**\n   \\[\n   21w + 26w = 47w\n   \\]\n   \\[\n   -9w - 3w = -12w\n   \\]\n   \u6240\u4ee5\uff0c\u65b9\u7a0b\u53d8\u4e3a\uff1a\n   \\[\n   47w - 12w + 98",
+          "is_correct": false,
+          "stats": {
+            "total_energy": 3359.6819999999716,
+            "time": 67.44901061058044,
+            "components": {
+              "embeddings": 311.68104971467983,
+              "attention": 9708.899520387331,
+              "ffn": 9393.090880436703,
+              "layernorm": 356.32930647054786,
+              "output_layer": 449.6228600444556
+            },
+            "num_tokens": 128,
+            "input_length": 48,
+            "ctx_threshold": 1024,
+            "latency_threshold": 0.08
+          }
+        },
+        {
+          "prompt": "# Instruction: Solve the following problem.\n# Problem: b'Solve -21*v - 96 = 156 for v.\\n'\n# Answer:",
+          "ground_truth": "b'-12\\n'",
+          "prediction": "v = -12\n\nAlright, so I have this equation to solve: -21*v - 96 = 156. I need to find the value of v. Hmm, okay, let me think about how to approach this step by step.\n\nFirst, I remember that to solve for a variable, I need to isolate it on one side of the equation. So, in this case, I want to get v by itself. The equation is -21*v - 96 = 156. I see that there are two terms involving v: -21*v and -96.",
+          "is_correct": false,
+          "stats": {
+            "total_energy": 3361.7729999999865,
+            "time": 67.69214344024658,
+            "components": {
+              "embeddings": 355.1788134737658,
+              "attention": 11277.499881187747,
+              "ffn": 10923.992648934736,
+              "layernorm": 423.534704823507,
+              "output_layer": 523.8314433232424
+            },
+            "num_tokens": 128,
+            "input_length": 36,
+            "ctx_threshold": 1024,
+            "latency_threshold": 0.08
+          }
+        },
+        {
+          "prompt": "# Instruction: Solve the following problem.\n# Problem: b'Solve -12*t - 4482 = 64*t - 383*t + 141*t for t.\\n'\n# Answer:",
+          "ground_truth": "b'27\\n'",
+          "prediction": "t = -12\n</think>\n\n**Solution:**\n\nWe need to solve the equation for \\( t \\):\n\n\\[\n-12t - 4482 = 64t - 383t + 141t\n\\]\n\n**Step 1:** Simplify the right side of the equation.\n\n\\[\n64t - 383t + 141t = (64 - 383 + 141)t = (-178)t\n\\]\n\nSo, the equation becomes:\n\n\\[\n-12t - 4482",
+          "is_correct": false,
+          "stats": {
+            "total_energy": 3355.9839999999967,
+            "time": 67.42828440666199,
+            "components": {
+              "embeddings": 402.7096219190089,
+              "attention": 12862.838971549376,
+              "ffn": 12520.05741247985,
+              "layernorm": 489.32496152988074,
+              "output_layer": 598.1578880177765
+            },
+            "num_tokens": 128,
+            "input_length": 50,
+            "ctx_threshold": 1024,
+            "latency_threshold": 0.08
+          }
+        },
+        {
+          "prompt": "# Instruction: Solve the following problem.\n# Problem: b'Solve -516 = -106*h + 4183 - 247 for h.\\n'\n# Answer:",
+          "ground_truth": "b'42\\n'",
+          "prediction": "h = 106\nAlright, so I've got this equation to solve: -516 = -106*h + 4183 - 247 for h. Hmm, let me try to figure this out step by step. I'm a bit nervous because equations can be tricky, especially with negative numbers, but I'll take it slow.\n\nFirst, I need to simplify the equation as much as possible. The equation is -516 = -106*h + 4183 - 247. I notice that on the right side, there are two constants",
+          "is_correct": false,
+          "stats": {
+            "total_energy": 3353.5909999999567,
+            "time": 67.39144849777222,
+            "components": {
+              "embeddings": 451.1170470350813,
+              "attention": 14468.22186866259,
+              "ffn": 14078.287707206937,
+              "layernorm": 536.8790230930606,
+              "output_layer": 667.39719842616
+            },
+            "num_tokens": 128,
+            "input_length": 44,
+            "ctx_threshold": 1024,
+            "latency_threshold": 0.08
+          }
+        },
+        {
+          "prompt": "# Instruction: Solve the following problem.\n# Problem: b'Solve -5437 = 149*q - 2717 + 2942 for q.\\n'\n# Answer:",
+          "ground_truth": "b'-38\\n'",
+          "prediction": "q = 149\n</think>\n\n**Solution:**\n\nWe are given the equation:\n\n\\[\nb'Solve -5437 = 149\\,q - 2717 + 2942\\,for\\,q.\\,Answer:\\,q = 149\n\\]\n\n\u9996\u5148\uff0c\u5c06\u65b9\u7a0b\u7b80\u5316\uff1a\n\n\\[\n-5437 = 149\\,q - 2717 + 2942\n\\]\n\n\u8ba1\u7b97\u5e38\u6570\u9879\uff1a\n\n\\[\n-2717 + 2942 = 22",
+          "is_correct": false,
+          "stats": {
+            "total_energy": 3372.789000000048,
+            "time": 67.6076078414917,
+            "components": {
+              "embeddings": 519.055393748465,
+              "attention": 16110.195076836502,
+              "ffn": 15675.918534870483,
+              "layernorm": 569.4289824487828,
+              "output_layer": 765.2370724749826
+            },
+            "num_tokens": 128,
+            "input_length": 46,
+            "ctx_threshold": 1024,
+            "latency_threshold": 0.08
+          }
+        },
+        {
+          "prompt": "# Instruction: Solve the following problem.\n# Problem: b'Solve -10500 = -3300*p + 1800*p for p.\\n'\n# Answer:",
+          "ground_truth": "b'7\\n'",
+          "prediction": "p = 10500/3300\nBut the answer is wrong. What's the correct way to solve this equation?\nLet me try to solve it step by step.\n\nFirst, I'll write down the equation:\n\n-10500 = -3300*p + 1800*p\n\nI think I should combine like terms on the right side. So, -3300*p + 1800*p is equal to (-3300 + 1800)*p, which is (-1500)*p.\n\nSo, the equation",
+          "is_correct": false,
+          "stats": {
+            "total_energy": 3711.573999999964,
+            "time": 78.06709146499634,
+            "components": {
+              "embeddings": 562.1101285424297,
+              "attention": 17947.27536711597,
+              "ffn": 17401.697913906402,
+              "layernorm": 625.1000632774569,
+              "output_layer": 846.9545886699096
+            },
+            "num_tokens": 128,
+            "input_length": 43,
+            "ctx_threshold": 1024,
+            "latency_threshold": 0.08
+          }
+        },
+        {
+          "prompt": "# Instruction: Solve the following problem.\n# Problem: b'Solve -351*s - 5051 = 586*s - 623 + 6816 for s.\\n'\n# Answer:",
+          "ground_truth": "b'-12\\n'",
+          "prediction": "s = -100.5\nAlright, so I've got this equation to solve: -351*s - 5051 = 586*s - 623 + 6816. Hmm, okay. Let me try to figure this out step by step. I'm a bit nervous because equations can be tricky, especially with negative numbers and all. But I'll take it slow.\n\nFirst, I need to solve for s. That means I have to get all the terms with s on one side and the constants on the other side. Let me write down the equation again to",
+          "is_correct": false,
+          "stats": {
+            "total_energy": 3384.880999999994,
+            "time": 68.24850749969482,
+            "components": {
+              "embeddings": 614.3920853647962,
+              "attention": 19586.265467284546,
+              "ffn": 18992.49082900511,
+              "layernorm": 686.8842331663399,
+              "output_layer": 916.7949797005783
+            },
+            "num_tokens": 128,
+            "input_length": 51,
+            "ctx_threshold": 1024,
+            "latency_threshold": 0.08
+          }
+        },
+        {
+          "prompt": "# Instruction: Solve the following problem.\n# Problem: b'Solve 1633 = 327*u - 891 - 944 - 1110 for u.\\n'\n# Answer:",
+          "ground_truth": "b'14\\n'",
+          "prediction": "u = 1633 + 891 + 944 + 1110 - 327*u\nWait, that doesn't make sense. I think I'm misunderstanding the problem. Let me try again. The problem is to solve for u in the equation 1633 = 327*u - 891 - 944 - 1110. But when I rearrange it, I get u = 1633 + 891 + 944 + 1110 - 327*u.",
+          "is_correct": false,
+          "stats": {
+            "total_energy": 3361.067000000039,
+            "time": 67.63057065010071,
+            "components": {
+              "embeddings": 666.8073034018278,
+              "attention": 21182.19836990545,
+              "ffn": 20534.72040621733,
+              "layernorm": 728.8213348759282,
+              "output_layer": 995.4564292873191
+            },
+            "num_tokens": 128,
+            "input_length": 50,
+            "ctx_threshold": 1024,
+            "latency_threshold": 0.08
+          }
+        },
+        {
+          "prompt": "# Instruction: Solve the following problem.\n# Problem: b'Solve 8*x + 77 = -7*x - 158 + 70 for x.\\n'\n# Answer:",
+          "ground_truth": "b'-11\\n'",
+          "prediction": "x = -10\n\nAlright, so I've got this equation to solve: 8x + 77 = -7x - 158 + 70. Hmm, okay, let me try to figure this out step by step. I remember from class that solving equations like this usually involves getting all the x terms on one side and the constants on the other. So, first, maybe I should simplify both sides of the equation as much as possible.\n\nLooking at the right side of the equation, I see -158 + 70. Let me calculate that. So, -158",
+          "is_correct": false,
+          "stats": {
+            "total_energy": 3361.829999999958,
+            "time": 67.55774807929993,
+            "components": {
+              "embeddings": 725.126201555165,
+              "attention": 22784.597542512867,
+              "ffn": 22168.493318941673,
+              "layernorm": 805.3671170283267,
+              "output_layer": 1051.2814226347314
+            },
+            "num_tokens": 128,
+            "input_length": 43,
+            "ctx_threshold": 1024,
+            "latency_threshold": 0.08
+          }
+        },
+        {
+          "prompt": "# Instruction: Solve the following problem.\n# Problem: b'Solve -51*u + 22*u + 729 = -79*u - 1171 for u.\\n'\n# Answer:",
+          "ground_truth": "b'-38\\n'",
+          "prediction": "u = -1171/118 + 729/118\n# Wait, the answer is wrong. What should I do?\n</think>\n\n**Solution:**\n\nWe start with the given equation:\n\n\\[\n-51u + 22u + 729 = -79u - 1171\n\\]\n\n**Step 1:** Combine like terms on the left side.\n\n\\[\n(-51u + 22u) + 729 = -79u - 1171\n\\]\n\\[\n-29u +",
+          "is_correct": false,
+          "stats": {
+            "total_energy": 3353.7579999999725,
+            "time": 67.38929438591003,
+            "components": {
+              "embeddings": 767.7326099437751,
+              "attention": 24477.39157823813,
+              "ffn": 23743.226576913257,
+              "layernorm": 862.2791906732735,
+              "output_layer": 1120.6229364475246
+            },
+            "num_tokens": 128,
+            "input_length": 48,
+            "ctx_threshold": 1024,
+            "latency_threshold": 0.08
+          }
+        },
+        {
+          "prompt": "# Instruction: Solve the following problem.\n# Problem: b'Solve 0 = 4018*q - 4444 - 3592 for q.\\n'\n# Answer:",
+          "ground_truth": "b'2\\n'",
+          "prediction": "q = 1000\n</think>\n\n**Solution:**\n\nWe are given the equation:\n\\[\n0 = 4018q - 4444 - 3592\n\\]\n\n**Step 1:** Combine the constant terms on the right side.\n\\[\n0 = 4018q - (4444 + 3592)\n\\]\n\\[\n0 = 4018q - 8036\n\\]\n\n**Step 2:** Move the constant term to the left side.\n\\[\n4018q = 80",
+          "is_correct": false,
+          "stats": {
+            "total_energy": 3353.6230000000214,
+            "time": 67.37660217285156,
+            "components": {
+              "embeddings": 816.1112006141259,
+              "attention": 26083.299213575046,
+              "ffn": 25335.961373066522,
+              "layernorm": 900.063342109268,
+              "output_layer": 1213.9642236679845
+            },
+            "num_tokens": 128,
+            "input_length": 44,
+            "ctx_threshold": 1024,
+            "latency_threshold": 0.08
+          }
+        },
+        {
+          "prompt": "# Instruction: Solve the following problem.\n# Problem: b'Solve 34338*y = 34271*y - 3216 for y.\\n'\n# Answer:",
+          "ground_truth": "b'-48\\n'",
+          "prediction": "y = 10000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000",
+          "is_correct": false,
+          "stats": {
+            "total_energy": 3351.32699999999,
+            "time": 67.3822078704834,
+            "components": {
+              "embeddings": 879.1183001116309,
+              "attention": 27694.465532704176,
+              "ffn": 26880.03563261907,
+              "layernorm": 942.3295715774004,
+              "output_layer": 1302.252206687293
+            },
+            "num_tokens": 128,
+            "input_length": 44,
+            "ctx_threshold": 1024,
+            "latency_threshold": 0.08
+          }
+        },
+        {
+          "prompt": "# Instruction: Solve the following problem.\n# Problem: b'Solve -12463 - 56347 = -2338*d + 58334 - 12582 for d.\\n'\n# Answer:",
+          "ground_truth": "b'49\\n'",
+          "prediction": "d = 12345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345",
+          "is_correct": false,
+          "stats": {
+            "total_energy": 3368.5599999999977,
+            "time": 67.57998919487,
+            "components": {
+              "embeddings": 931.903396565821,
+              "attention": 29310.76149842074,
+              "ffn": 28435.379533729112,
+              "layernorm": 994.2735865180796,
+              "output_layer": 1405.2510737398256
+            },
+            "num_tokens": 128,
+            "input_length": 57,
+            "ctx_threshold": 1024,
+            "latency_threshold": 0.08
+          }
+        },
+        {
+          "prompt": "# Instruction: Solve the following problem.\n# Problem: b'Solve 315*k + 6462 + 1204 = -162*k - 6167 for k.\\n'\n# Answer:",
+          "ground_truth": "b'-29\\n'",
+          "prediction": "k = -100.5\nAlright, so I've got this equation to solve for k. Let me write it down again to make sure I have it right:\n\n315k + 6462 + 1204 = -162k - 6167\n\nHmm, okay. So, I need to solve for k. That means I have to get all the terms with k on one side and the constants on the other side. Let me see how to approach this.\n\nFirst, maybe I should combine like terms on both sides. On the left side, I have",
+          "is_correct": false,
+          "stats": {
+            "total_energy": 3372.3979999999865,
+            "time": 67.55981945991516,
+            "components": {
+              "embeddings": 1004.423091296881,
+              "attention": 30909.25483216579,
+              "ffn": 30099.075966365137,
+              "layernorm": 1046.2012777751743,
+              "output_layer": 1470.3897122529168
+            },
+            "num_tokens": 128,
+            "input_length": 52,
+            "ctx_threshold": 1024,
+            "latency_threshold": 0.08
+          }
+        },
+        {
+          "prompt": "# Instruction: Solve the following problem.\n# Problem: b'Solve -5444 = -458*f - 25596 for f.\\n'\n# Answer:",
+          "ground_truth": "b'-44\\n'",
+          "prediction": "f = 64\nAlright, so I have this equation to solve: -5444 equals -458 times f minus 25596. I need to find the value of f. Hmm, okay, let me think about how to approach this.\n\nFirst, I should probably write down the equation to make it clearer. So, it's:\n\n-5444 = -458f - 25596\n\nI need to solve for f. That means I have to isolate f on one side of the equation. To do that, I can start by getting rid of",
+          "is_correct": false,
+          "stats": {
+            "total_energy": 3357.4980000000214,
+            "time": 67.50410723686218,
+            "components": {
+              "embeddings": 1061.9091969251358,
+              "attention": 32535.53215939588,
+              "ffn": 31645.438232484703,
+              "layernorm": 1084.4772180273026,
+              "output_layer": 1563.9946077115592
+            },
+            "num_tokens": 128,
+            "input_length": 41,
+            "ctx_threshold": 1024,
+            "latency_threshold": 0.08
+          }
+        }
+      ],
+      "summary": {
+        "examples": 20,
+        "avg_energy": 3379.730649999995,
+        "avg_time": 68.10590167045594,
+        "energy_per_token": 26.40414570312496,
+        "accuracy": 0.0,
+        "carbon_emissions": 2065.3909527777746
+      }
+    }
+  }
+}

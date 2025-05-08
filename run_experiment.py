@@ -333,3 +333,10 @@ if __name__ == "__main__":
 
 # qwen 50 samples
 # python run_experiment.py --task math --model deepseek-ai/DeepSeek-R1-Distill-Qwen-1.5B --modes fp16 int8_vanilla int4_vanilla adaptive --num_examples 20  --device_map cuda --out results/results_math_qwen_20examples.json
+
+## cmd for mmlu
+
+# coder 50 samples
+# python run_experiment.py --task mmlu --model deepseek-ai/deepseek-coder-1.3b-instruct --modes fp16 int8_vanilla int4_vanilla adaptive --num_examples 1  --dataset_name  --out results/results_mmlu_coder_50examples.json
+
+# qwen distill 50 samples
