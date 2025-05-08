@@ -489,37 +489,30 @@ def test_generation_MATH(
     latency_threshold=0.08
 ):
     """
-    Benchmark energy use and accuracy on MATH dataset with static or adaptive quantization.
-    Returns per-mode examples and summaries.
+    Benchmark energy use and accuracy on MATH dataset with static or adaptive quant.
     """
-    # prepare results container
     results = {mode: {"examples": [], "summary": {}} for mode in quantization_modes}
 
     # load and sample dataset
-    ds = load_dataset(dataset_name, dataset_config, split=split)
-    ds = ds.select(range(num_examples))
+    ds = load_dataset(dataset_name, dataset_config, split=split).select(range(num_examples))
 
-    # get carbon intensity
-    carbon_intensity = get_carbon_intensity()
+    carbon = get_carbon_intensity()
     if verbose:
-        print(f"Carbon intensity: {carbon_intensity} gCO2eq/kWh")
+        print(f"Carbon intensity: {carbon} gCO2eq/kWh")
 
     # prepare tokenizer
     tokenizer = AutoTokenizer.from_pretrained(model_name)
     special_tokens = ['<｜User｜>', '<｜Assistant｜>', '<think>']
     tokenizer.add_special_tokens({'additional_special_tokens': special_tokens})
 
-    # iterate over quantization modes
     for mode in quantization_modes:
         if verbose:
             print(f"\n=== Testing {mode.upper()} on MATH ===")
         try:
-            # free up memory
             clean_memory()
 
-            # adaptive quantization branch
+            # adaptive branch
             if mode == 'adaptive':
-                # initialize adaptive generator
                 agent = AdaptiveQuantGenerator(
                     model_name,
                     high_mode=high_mode,
@@ -531,71 +524,61 @@ def test_generation_MATH(
                 correct = 0
                 total_tokens = 0
 
-                # loop through samples
                 for item in tqdm(ds, desc="MATH ADAPTIVE"):
-                    question = item['question']
-                    answer = item['answer'].strip()
+                    q = item['question']
+                    ans = item['answer'].strip()
 
-                    # format prompt for final answer only
-                    prompt = f"<｜User｜>{question}<｜Assistant｜><think>"
+                    # build instruction-style prompt
+                    prompt = (
+                        "# Instruction: Solve the following problem.\n"
+                        f"# Problem: {q}\n"
+                        "# Answer:"
+                    )
 
-                    # record input length for decoding
-                    input_ids = tokenizer(prompt, return_tensors='pt', truncation=True, max_length=512).input_ids.cuda()
-                    input_len = input_ids.size(1)
-
-                    # run adaptive evaluation
-                    gen_ids, logits, stats = agent.evaluate(
-                        prompt,
-                        tokenizer,
+                    # measure with adaptive generator
+                    gen_ids, _, stats = agent.evaluate(
+                        prompt, tokenizer,
                         max_new_tokens=128,
                         temperature=temperature,
                         top_p=top_p
                     )
 
-                    # extract generated tokens and decode
+                    # decode only new tokens
+                    input_len = tokenizer(prompt, return_tensors='pt').input_ids.size(1)
                     gen_tokens = gen_ids[0, input_len:]
-                    pred_text = tokenizer.decode(gen_tokens, skip_special_tokens=True).strip()
+                    pred = tokenizer.decode(gen_tokens, skip_special_tokens=True).strip()
 
-                    # accuracy and token count
-                    is_correct = (pred_text == answer)
-                    correct += int(is_correct)
+                    is_corr = (pred == ans)
+                    correct += int(is_corr)
                     total_tokens += stats.get('num_tokens', 1)
 
-                    # record example
                     results[mode]['examples'].append({
                         'prompt': prompt,
-                        'ground_truth': answer,
-                        'prediction': pred_text,
-                        'is_correct': is_correct,
+                        'ground_truth': ans,
+                        'prediction': pred,
+                        'is_correct': is_corr,
                         'stats': stats
                     })
 
-                # summarize adaptive results
-                count = len(results[mode]['examples'])
-                total_energy = sum(e['stats']['total_energy'] for e in results[mode]['examples'])
-                total_time = sum(e['stats']['time'] for e in results[mode]['examples'])
-                avg_energy = total_energy / count if count else 0
-                avg_time = total_time / count if count else 0
-                energy_per_token = total_energy / total_tokens if total_tokens else 0
-                accuracy = 100 * correct / count if count else 0
-                carbon_emissions = joules_to_co2(total_energy, carbon_intensity)
-
+                # summarize adaptive
+                ex = results[mode]['examples']
+                n = len(ex)
+                e_total = sum(x['stats']['total_energy'] for x in ex)
+                t_total = sum(x['stats']['time'] for x in ex)
                 results[mode]['summary'] = {
-                    'examples': count,
-                    'avg_energy': avg_energy,
-                    'avg_time': avg_time,
-                    'energy_per_token': energy_per_token,
-                    'accuracy': accuracy,
-                    'carbon_emissions': carbon_emissions
+                    'examples': n,
+                    'avg_energy': e_total / n if n else 0,
+                    'avg_time': t_total / n if n else 0,
+                    'energy_per_token': e_total / total_tokens if total_tokens else 0,
+                    'accuracy': 100 * correct / n if n else 0,
+                    'carbon_emissions': joules_to_co2(e_total, carbon)
                 }
 
-                # clean up
                 del agent
                 clean_memory()
                 continue
 
-            # static quantization branch
-            # load model and energy tracker
+            # static branch
             model = load_llm(model_name, mode=mode, device_map=device_map)
             q_mode, _ = _parse_mode(mode)
             tracker = EnergyTracker(model, precision_mode=q_mode)
@@ -603,84 +586,67 @@ def test_generation_MATH(
             correct = 0
             total_tokens = 0
 
-            # iterate samples
             for item in tqdm(ds, desc=f"MATH {mode.upper()}"):
-                question = item['question']
-                answer = item['answer'].strip()
-                prompt = f"<｜User｜>{question}<｜Assistant｜><think>"
+                q = item['question']
+                ans = item['answer'].strip()
 
-                # tokenize
-                inputs = tokenizer(
-                    prompt,
-                    return_tensors='pt',
-                    truncation=True,
-                    max_length=512
+                # build instruction-style prompt
+                prompt = (
+                    "# Instruction: Solve the following problem.\n"
+                    f"# Problem: {q}\n"
+                    "# Answer:"
                 )
 
-                # inference with energy tracking
+                # energy-tracked generation
                 try:
-                    logits, stats = tracker.measure_text(
-                        inputs.input_ids,
-                        tokenizer,
+                    gen_ids, stats = tracker.measure_generation(
+                        prompt, tokenizer,
                         temperature=temperature,
                         top_p=top_p
                     )
                 except torch.cuda.OutOfMemoryError:
-                    inputs = tokenizer(
-                        prompt,
-                        return_tensors='pt',
-                        truncation=True,
-                        max_length=256
+                    # retry with shorter prompt
+                    short = tokenizer(
+                        prompt, return_tensors='pt',
+                        truncation=True, max_length=256
                     )
-                    logits, stats = tracker.measure_text(
-                        inputs.input_ids,
-                        tokenizer,
+                    gen_ids, stats = tracker.measure_generation(
+                        short.input_ids.to(model.device), tokenizer,
                         temperature=temperature,
                         top_p=top_p
                     )
 
-                # decode prediction
-                pred_tokens = torch.argmax(logits, dim=-1)
-                pred_text = tokenizer.batch_decode(
-                    pred_tokens,
-                    skip_special_tokens=True
-                )[-1].strip()
+                # decode output
+                pred = tokenizer.decode(gen_ids[0], skip_special_tokens=True).strip()
 
-                # accuracy and token count
-                is_correct = (pred_text == answer)
-                correct += int(is_correct)
+                is_corr = (pred == ans)
+                correct += int(is_corr)
                 total_tokens += stats.get('num_tokens', 1)
 
-                # record example
                 results[mode]['examples'].append({
                     'prompt': prompt,
-                    'ground_truth': answer,
-                    'prediction': pred_text,
-                    'is_correct': is_correct,
+                    'ground_truth': ans,
+                    'prediction': pred,
+                    'is_correct': is_corr,
                     'stats': stats
                 })
 
-            # summarize static results
-            count = len(results[mode]['examples'])
-            total_energy = sum(e['stats']['total_energy'] for e in results[mode]['examples'])
-            total_time = sum(e['stats']['time'] for e in results[mode]['examples'])
-            avg_energy = total_energy / count if count else 0
-            avg_time = total_time / count if count else 0
-            energy_per_token = total_energy / total_tokens if total_tokens else 0
-            accuracy = 100 * correct / count if count else 0
-            carbon_emissions = joules_to_co2(total_energy, carbon_intensity)
-
+            # summarize static
+            ex = results[mode]['examples']
+            n = len(ex)
+            e_total = sum(x['stats']['total_energy'] for x in ex)
+            t_total = sum(x['stats']['time'] for x in ex)
             results[mode]['summary'] = {
-                'examples': count,
-                'avg_energy': total_energy / count if count else 0,
-                'avg_time': total_time / count if count else 0,
-                'energy_per_token': energy_per_token,
-                'accuracy': accuracy,
-                'carbon_emissions': carbon_emissions
+                'examples': n,
+                'avg_energy': e_total / n if n else 0,
+                'avg_time': t_total / n if n else 0,
+                'energy_per_token': e_total / total_tokens if total_tokens else 0,
+                'accuracy': 100 * correct / n if n else 0,
+                'carbon_emissions': joules_to_co2(e_total, carbon)
             }
 
             if verbose:
-                print(f"{mode.upper()} SUMMARY: Samples={count}, Acc={accuracy:.2f}%,")
+                print(f"{mode.upper()} SUMMARY: Samples={n}, Acc={results[mode]['summary']['accuracy']:.2f}%")
 
             del model, tracker
             clean_memory()
@@ -690,6 +656,7 @@ def test_generation_MATH(
             results[mode]['summary']['error'] = str(e)
 
     return results
+
 
 
 
