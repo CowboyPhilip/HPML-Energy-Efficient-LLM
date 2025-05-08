@@ -19,32 +19,61 @@ import ast
 import contextlib
 import io
 
-def extract_clean_function_code_from_output(text):
+def extract_clean_function_code_from_output(text: str):
     """
-    从模型输出中提取 [BEGIN]<｜Assistant｜><think> 和 [END]<｜Assistant｜><think> 之间的代码，
-    然后仅提取有效的函数定义（忽略 print、assert 等）。
-    
-    Args:
-        text (str): 包含模型输出的字符串
-        
-    Returns:
-        str or None: 清洗后的函数定义代码，若未找到则返回 None
+    从 LLM 输出中提取有效函数定义。优先解析 [BEGIN]... 区块，
+    如果不存在，则尝试提取 markdown ```python``` 块或 def 函数块。
+    返回 AST 校验通过的函数代码。
     """
-    # 提取代码块
-    pattern = r"\[BEGIN\]<｜Assistant｜><think>\n(.*?)\n\[END\]<｜Assistant｜><think>"
-    match = re.search(pattern, text, re.DOTALL)
-    if not match:
-        return None
-    code_block = match.group(1).strip()
-    
-    # 提取函数定义
+    def extract_def_block(raw: str) -> str:
+        """从任意 code block 文本中提取 def 函数定义"""
+        # 只保留 def 开头的函数定义及其缩进块
+        lines = raw.strip().splitlines()
+        def_lines = []
+        inside_func = False
+        for line in lines:
+            if re.match(r"^def\s+\w+\(.*\):", line):
+                inside_func = True
+                def_lines.append(line)
+            elif inside_func and (line.startswith("    ") or line.startswith("\t")):
+                def_lines.append(line)
+            elif inside_func:
+                break
+        return "\n".join(def_lines)
+
+    # 1. 优先尝试 [BEGIN]<｜Assistant｜><think> 格式
+    begin_pattern = r"\[BEGIN\]<｜Assistant｜><think>\n(.*?)\n\[END\]<｜Assistant｜><think>"
+    match = re.search(begin_pattern, text, re.DOTALL)
+    if match:
+        block = match.group(1).strip()
+
+        # 如果内部还有 ```python ... ``` 块，进一步提取
+        md_inner = re.search(r"```python\n(.*?)```", block, re.DOTALL | re.IGNORECASE)
+        if md_inner:
+            code_block = extract_def_block(md_inner.group(1))
+        else:
+            code_block = extract_def_block(block)
+    else:
+        # 2. fallback: markdown python 块
+        md_match = re.search(r"```python\n(.*?)```", text, re.DOTALL | re.IGNORECASE)
+        if md_match:
+            code_block = extract_def_block(md_match.group(1))
+        else:
+            # 3. fallback: 第一个 def 函数块
+            def_match = re.search(r"(def\s+\w+\(.*?\):(?:\n(?: {4}|\t).*)*)", text, re.DOTALL)
+            if def_match:
+                code_block = def_match.group(1).strip()
+            else:
+                return "code block not found"
+
+    # 4. AST 校验
     try:
         tree = ast.parse(code_block)
         func_defs = [node for node in tree.body if isinstance(node, ast.FunctionDef)]
-        return "\n\n".join([ast.unparse(func) for func in func_defs])
-    except Exception:
-        return None
-
+        return "\n\n".join([ast.unparse(func) for func in func_defs]) if func_defs else None
+    except Exception as e:
+        print("AST Error Input:\n", code_block)
+        return "ast grammar error!"
 
 def compare_generation_energy(model_name, prompt, quantization_modes=['fp32'], verbose=True, device_map: str = "auto"):
     """
@@ -386,17 +415,17 @@ def test_generation_MBPP(
                 # inference
                 try:
                     # logits, stats = tracker.measure_text(tokens.input_ids.to(model.device), tokenizer, temperature, top_p)
-                    print("===1===")
+                    # print("===1===")
                     gen_ids, stats = tracker.measure_generation(prompt, tokenizer, temperature, top_p)
                 except torch.cuda.OutOfMemoryError:
                     # 如果mem不足 需要截断prompt 以节省memory
-                    print("===2===")
+                    # print("===2===")
                     tokenized_prompt = tokenizer(prompt, return_tensors='pt',
                             padding=True, truncation=True, max_length=128)
                     gen_ids, stats = tracker.measure_generation(tokenized_prompt.input_ids.to(model.device), tokenizer, temperature, top_p)
 
                 # decode
-                print("===3===")
+                # print("===3===")
                 gen_text = tokenizer.decode(gen_ids[0], skip_special_tokens=True)
                 gen_code = extract_clean_function_code_from_output(gen_text)
                 # eval
@@ -407,6 +436,7 @@ def test_generation_MBPP(
                 examples.append({
                     'prompt': prompt,
                     'ground_truth_code': ex['code'],
+                    'generated_text': gen_text,
                     'generated_code': gen_code,
                     'test_list': ex['test_list'],
                     'is_correct': is_corr,
