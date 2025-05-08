@@ -106,8 +106,8 @@ def run_mbpp(args):
         num_examples=args.num_examples,
         verbose=args.verbose,
         device_map=args.device_map,
-        temperature=args.temperature,
-        top_p=args.top_p,
+        temperature=0,
+        top_p=0.9,
         high_mode=args.high_mode,
         low_mode=args.low_mode,
         ctx_threshold=args.ctx_threshold,
@@ -283,6 +283,7 @@ def main():
 
     wandb.init(
     project="HPML-Energy-Efficient-LLM",
+    entity = "HPML-Energy-Efficient-LLM",
     name=f"{args.model}-{args.task}-{args.modes}",
     tags=[args.model.split('/')[-1], args.task] + args.modes,
     group=args.model.split('/')[-1],
@@ -313,3 +314,8 @@ def main():
 
 if __name__ == "__main__":
     main()
+
+
+
+# cmd for testing mbpp
+# python run_experiment.py --task mbpp --model deepseek-ai/deepseek-coder-1.3b-instruct --modes fp16 int8_vanilla int4_vanilla adaptive --num_examples 1  --device_map cuda --out results_mbpp_coder.json

@@ -406,7 +406,7 @@ def test_generation_MBPP(
                 # hdr = "output only the code, no explanation: "
                 task = ex['text']
                 test = "\n".join(ex['test_list'])
-                prompt_body = f"You are an expert Python programmer, and here is your task: {task} Your code should pass these tests:\n\n{test}\n[BEGIN]"
+                prompt_body = f"You are an expert Python programmer, and here is your task: {task} You should only output code without explanation and your code should pass these tests:\n\n{test}\n[BEGIN]"
                 prompt = f"<｜begin▁of▁sentence｜><｜User｜>{prompt_body}<｜Assistant｜><think>"
 
                 # inference
