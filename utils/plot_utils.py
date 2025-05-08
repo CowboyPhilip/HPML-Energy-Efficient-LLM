@@ -190,3 +190,5 @@ def plot_component_energy(results, task_type='generation', quant_mode='int4'):
             plt.axis('equal')
             plt.title(f'Component Energy Breakdown - {task_name.upper()} Task ({quant_mode.upper()})')
             plt.show()
+
+def plot_
