@@ -68,13 +68,13 @@ def quick_test_mmlu(
 
             is_corr = (text == answer)
 
-#             # 🌟 Debug output
-#             print(f"\n[DEBUG] Subject: {subj}")
-#             print(f"Question: {item['question']}")
-#             print(f"Choices: {item['choices']}")
-#             print(f"Predicted: {text}")
-#             print(f"Actual: {answer}")
-#             print(f"Correct? {'✅' if is_corr else '❌'}")
+            # 🌟 Debug output
+            print(f"\n[DEBUG] Subject: {subj}")
+            print(f"Question: {item['question']}")
+            print(f"Choices: {item['choices']}")
+            print(f"Predicted: {text}")
+            print(f"Actual: {answer}")
+            print(f"Correct? {'✅' if is_corr else '❌'}")
                 
             correct += int(is_corr)
             total_tokens += stats.get("num_tokens", 1)
