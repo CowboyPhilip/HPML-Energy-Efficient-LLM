@@ -1,0 +1,160 @@
+{
+  "mbpp": {
+    "fp16": {
+      "examples": [
+        {
+          "prompt": "<\uff5cbegin\u2581of\u2581sentence\uff5c><\uff5cUser\uff5c>You are an expert Python programmer, and here is your task: Write a python function to remove first and last occurrence of a given character from the string. You should only output code without explanation and your code should pass these tests:\n\nassert remove_Occ(\"hello\",\"l\") == \"heo\"\nassert remove_Occ(\"abcda\",\"a\") == \"bcd\"\nassert remove_Occ(\"PHP\",\"P\") == \"H\"\n[BEGIN]<\uff5cAssistant\uff5c><think>",
+          "ground_truth_code": "def remove_Occ(s,ch): \r\n    for i in range(len(s)): \r\n        if (s[i] == ch): \r\n            s = s[0 : i] + s[i + 1:] \r\n            break\r\n    for i in range(len(s) - 1,-1,-1):  \r\n        if (s[i] == ch): \r\n            s = s[0 : i] + s[i + 1:] \r\n            break\r\n    return s ",
+          "generated_text": "<\uff5cUser\uff5c>You are an expert Python programmer, and here is your task: Write a python function to remove first and last occurrence of a given character from the string. You should only output code without explanation and your code should pass these tests:\n\nassert remove_Occ(\"hello\",\"l\") == \"heo\"\nassert remove_Occ(\"abcda\",\"a\") == \"bcd\"\nassert remove_Occ(\"PHP\",\"P\") == \"H\"\n[BEGIN]<\uff5cAssistant\uff5c><think>\n\ndef remove_Occ(s, ch):\n    if ch not in s:\n        return s\n    else:\n        return s.replace(ch, '', 1)\n\nprint(remove_Occ(\"hello\",\"l\"))\nprint(remove_Occ(\"abcda\",\"a\"))\nprint(remove_Occ(\"PHP\",\"P\"))\n\n[END]<\uff5cAssistant\uff5c><think>\n\nThe function remove_Occ takes a string and a character as input and returns the string after removing the first occurrence of the character. If the character is not in the string",
+          "generated_code": "def remove_Occ(s, ch):\n    if ch not in s:\n        return s\n    else:\n        return s.replace(ch, '', 1)",
+          "test_list": [
+            "assert remove_Occ(\"hello\",\"l\") == \"heo\"",
+            "assert remove_Occ(\"abcda\",\"a\") == \"bcd\"",
+            "assert remove_Occ(\"PHP\",\"P\") == \"H\""
+          ],
+          "is_correct": false,
+          "stats": {
+            "total_energy": 2720.7759999999544,
+            "tokenization_energy": 2.6330000000307336,
+            "inference_energy": 2718.1429999999236,
+            "energy_per_token": 10.970870967741751,
+            "time": 64.9079978466034,
+            "components": {
+              "embeddings": 35.74349247236084,
+              "attention": 1211.4459820665866,
+              "ffn": 1410.664490071389,
+              "layernorm": 36.08267951727379,
+              "output_layer": 76.51454053321389
+            },
+            "num_tokens": 248
+          }
+        }
+      ],
+      "summary": {
+        "examples": 1,
+        "avg_energy": 2720.7759999999544,
+        "avg_time": 64.9079978466034,
+        "energy_per_token": 10.970870967741751,
+        "accuracy": 0.0,
+        "carbon_emissions": 83.13482222222082
+      }
+    },
+    "int8_vanilla": {
+      "examples": [
+        {
+          "prompt": "<\uff5cbegin\u2581of\u2581sentence\uff5c><\uff5cUser\uff5c>You are an expert Python programmer, and here is your task: Write a python function to remove first and last occurrence of a given character from the string. You should only output code without explanation and your code should pass these tests:\n\nassert remove_Occ(\"hello\",\"l\") == \"heo\"\nassert remove_Occ(\"abcda\",\"a\") == \"bcd\"\nassert remove_Occ(\"PHP\",\"P\") == \"H\"\n[BEGIN]<\uff5cAssistant\uff5c><think>",
+          "ground_truth_code": "def remove_Occ(s,ch): \r\n    for i in range(len(s)): \r\n        if (s[i] == ch): \r\n            s = s[0 : i] + s[i + 1:] \r\n            break\r\n    for i in range(len(s) - 1,-1,-1):  \r\n        if (s[i] == ch): \r\n            s = s[0 : i] + s[i + 1:] \r\n            break\r\n    return s ",
+          "generated_text": "<\uff5cUser\uff5c>You are an expert Python programmer, and here is your task: Write a python function to remove first and last occurrence of a given character from the string. You should only output code without explanation and your code should pass these tests:\n\nassert remove_Occ(\"hello\",\"l\") == \"heo\"\nassert remove_Occ(\"abcda\",\"a\") == \"bcd\"\nassert remove_Occ(\"PHP\",\"P\") == \"H\"\n[BEGIN]<\uff5cAssistant\uff5c><think>\n\ndef remove_Occ(s, ch):\n    if ch not in s:\n        return s\n    else:\n        return s.replace(ch, '', 1)\n\nprint(remove_Occ(\"hello\",\"l\"))\nprint(remove_Occ(\"abcda\",\"a\"))\nprint(remove_Occ(\"PHP\",\"P\"))\n\n[END]<\uff5cAssistant\uff5c><think>\n\nThe function remove_Occ takes a string and a character as input and returns the string after removing the first occurrence of the character. If the character is not in the string",
+          "generated_code": "def remove_Occ(s, ch):\n    if ch not in s:\n        return s\n    else:\n        return s.replace(ch, '', 1)",
+          "test_list": [
+            "assert remove_Occ(\"hello\",\"l\") == \"heo\"",
+            "assert remove_Occ(\"abcda\",\"a\") == \"bcd\"",
+            "assert remove_Occ(\"PHP\",\"P\") == \"H\""
+          ],
+          "is_correct": false,
+          "stats": {
+            "total_energy": 2643.3481840210325,
+            "tokenization_energy": 0.13418402099609375,
+            "inference_energy": 2643.2140000000363,
+            "energy_per_token": 10.658662032342873,
+            "time": 66.52798676490784,
+            "components": {
+              "embeddings": 33.160391955964265,
+              "attention": 1419.2785478021642,
+              "ffn": 1294.5242039731897,
+              "layernorm": 44.966909241828134,
+              "output_layer": 73.72893828897364
+            },
+            "num_tokens": 248
+          }
+        }
+      ],
+      "summary": {
+        "examples": 1,
+        "avg_energy": 2643.3481840210325,
+        "avg_time": 66.52798676490784,
+        "energy_per_token": 10.658662032342873,
+        "accuracy": 0.0,
+        "carbon_emissions": 80.76897228953155
+      }
+    },
+    "int4_vanilla": {
+      "examples": [
+        {
+          "prompt": "<\uff5cbegin\u2581of\u2581sentence\uff5c><\uff5cUser\uff5c>You are an expert Python programmer, and here is your task: Write a python function to remove first and last occurrence of a given character from the string. You should only output code without explanation and your code should pass these tests:\n\nassert remove_Occ(\"hello\",\"l\") == \"heo\"\nassert remove_Occ(\"abcda\",\"a\") == \"bcd\"\nassert remove_Occ(\"PHP\",\"P\") == \"H\"\n[BEGIN]<\uff5cAssistant\uff5c><think>",
+          "ground_truth_code": "def remove_Occ(s,ch): \r\n    for i in range(len(s)): \r\n        if (s[i] == ch): \r\n            s = s[0 : i] + s[i + 1:] \r\n            break\r\n    for i in range(len(s) - 1,-1,-1):  \r\n        if (s[i] == ch): \r\n            s = s[0 : i] + s[i + 1:] \r\n            break\r\n    return s ",
+          "generated_text": "<\uff5cUser\uff5c>You are an expert Python programmer, and here is your task: Write a python function to remove first and last occurrence of a given character from the string. You should only output code without explanation and your code should pass these tests:\n\nassert remove_Occ(\"hello\",\"l\") == \"heo\"\nassert remove_Occ(\"abcda\",\"a\") == \"bcd\"\nassert remove_Occ(\"PHP\",\"P\") == \"H\"\n[BEGIN]<\uff5cAssistant\uff5c><think>You can use the built-in Python function called `replace()` to remove the first and last occurrence of a character. Here is how you can do it:\n\ndef remove_Occ(s, ch):\n    return s.replace(ch, '', 1).replace(ch, '', 1)[::-1]\n\nprint(remove_Occ(\"hello\",\"l\"))\nprint(remove_Occ(\"abcda\",\"a\"))\nprint(remove_Occ(\"PHP\",\"P\"))\n[END]\n\nThis function works by first replacing the first occurrence of the character with an empty string, then",
+          "generated_code": "def remove_Occ(s, ch):\n    return s.replace(ch, '', 1).replace(ch, '', 1)[::-1]",
+          "test_list": [
+            "assert remove_Occ(\"hello\",\"l\") == \"heo\"",
+            "assert remove_Occ(\"abcda\",\"a\") == \"bcd\"",
+            "assert remove_Occ(\"PHP\",\"P\") == \"H\""
+          ],
+          "is_correct": false,
+          "stats": {
+            "total_energy": 2568.4949184755405,
+            "tokenization_energy": 0.13891847562789916,
+            "inference_energy": 2568.3559999999125,
+            "energy_per_token": 10.356834348691695,
+            "time": 61.61234164237976,
+            "components": {
+              "embeddings": 26.826681203829125,
+              "attention": 1243.9334205169512,
+              "ffn": 1194.6049462732376,
+              "layernorm": 48.20326857287623,
+              "output_layer": 61.62691666718108
+            },
+            "num_tokens": 248
+          }
+        }
+      ],
+      "summary": {
+        "examples": 1,
+        "avg_energy": 2568.4949184755405,
+        "avg_time": 61.61234164237976,
+        "energy_per_token": 10.356834348691695,
+        "accuracy": 0.0,
+        "carbon_emissions": 78.48178917564152
+      }
+    },
+    "adaptive": {
+      "examples": [
+        {
+          "prompt": "<\uff5cbegin\u2581of\u2581sentence\uff5c><\uff5cUser\uff5c>You are an expert Python programmer, and here is your task: Write a python function to remove first and last occurrence of a given character from the string. Your code should pass these tests:\n\nassert remove_Occ(\"hello\",\"l\") == \"heo\"\nassert remove_Occ(\"abcda\",\"a\") == \"bcd\"\nassert remove_Occ(\"PHP\",\"P\") == \"H\"\n[BEGIN]<\uff5cAssistant\uff5c><think>",
+          "ground_truth_code": "def remove_Occ(s,ch): \r\n    for i in range(len(s)): \r\n        if (s[i] == ch): \r\n            s = s[0 : i] + s[i + 1:] \r\n            break\r\n    for i in range(len(s) - 1,-1,-1):  \r\n        if (s[i] == ch): \r\n            s = s[0 : i] + s[i + 1:] \r\n            break\r\n    return s ",
+          "generated_text": "<\uff5cUser\uff5c>You are an expert Python programmer, and here is your task: Write a python function to remove first and last occurrence of a given character from the string. Your code should pass these tests:\n\nassert remove_Occ(\"hello\",\"l\") == \"heo\"\nassert remove_Occ(\"abcda\",\"a\") == \"bcd\"\nassert remove_Occ(\"PHP\",\"P\") == \"H\"\n[BEGIN]<\uff5cAssistant\uff5c><think>\n\ndef remove_Occ(s, ch):\n    if ch not in s:\n        return s\n    else:\n        return s.replace(ch, '', 1)\n\nprint(remove_Occ(\"hello\",\"l\"))\nprint(remove_Occ(\"abcda\",\"a\"))\nprint(remove_Occ(\"PHP\",\"P\"))\n\n[END]<\uff5cAssistant\uff5c><think>\n\nThe function remove_Occ takes a string and a character as input and returns the string after removing the first occurrence of the character. If the character is not in the string",
+          "generated_code": "def remove_Occ(s, ch):\n    if ch not in s:\n        return s\n    else:\n        return s.replace(ch, '', 1)",
+          "test_list": [
+            "assert remove_Occ(\"hello\",\"l\") == \"heo\"",
+            "assert remove_Occ(\"abcda\",\"a\") == \"bcd\"",
+            "assert remove_Occ(\"PHP\",\"P\") == \"H\""
+          ],
+          "is_correct": false,
+          "stats": {
+            "total_energy": 2474.8800000000047,
+            "time": 57.978381633758545,
+            "components": {
+              "embeddings": 31.935695762247775,
+              "attention": 1170.1177088840677,
+              "ffn": 1131.8228598422602,
+              "layernorm": 49.1659375795396,
+              "output_layer": 56.660544918983256
+            },
+            "num_tokens": 128,
+            "input_length": 112,
+            "ctx_threshold": 1024,
+            "latency_threshold": 0.08
+          }
+        }
+      ],
+      "summary": {
+        "examples": 1,
+        "avg_energy": 2474.8800000000047,
+        "avg_time": 57.978381633758545,
+        "energy_per_token": 19.335000000000036,
+        "accuracy": 0.0,
+        "carbon_emissions": 75.62133333333348
+      }
+    }
+  }
+}
