@@ -1,0 +1,37 @@
+{
+  "math": {
+    "fp16": {
+      "examples": [
+        {
+          "prompt": "# Instruction: Solve the following problem.\n# Problem: b'Solve -282*d + 929 - 178 = -1223 for d.\\n'\n# Answer:",
+          "ground_truth": "b'7\\n'",
+          "prediction": "# Instruction: Solve the following problem.\n# Problem: b'Solve -282*d + 929 - 178 = -1223 for d.\\n'\n# Answer: d = 1222\nAlright, so I've got this equation to solve: -282*d + 929 - 178 = -1223. Hmm, okay, let me try to figure this out step by step. I'm a bit nervous because equations can be tricky, especially with negative numbers and all, but I'll take it slow.\n\nFirst, I need to simplify the left side of the equation as much as possible. The left side has two terms with 'd' and some constants. Let me write it down again: -282*d + 929 - 178. I think I can combine the constants 929 and -178 first because they don't have 'd' in them.\n\nSo, 929 minus 178. Let me do that subtraction. 929 minus 100 is 829, then minus another 78 is 829 - 78. Hmm, 829 minus 70 is 759, and then minus 8 more is 751. So, 929 - 178 equals 751. Okay, so now the equation simplifies to -282*d + 751 = -1223.\n\nNow, I need to get all the constants on one side and the variable term on the other. So, I should subtract 751 from both sides to get rid of it on the left. Let me write that down: -282*d + 751 - 751 = -1223 - 751. Simplifying that, the left side becomes -282*d, and the right side is -1223 minus 751.\n\nLet me calculate -1223 minus 751. Hmm, 1223 plus 751 is... let's see, 1200 + 700 is 1900, 23 + 51 is 74, so total is 1974. But since both numbers are negative, it's -1974. So, the equation now is -282*d = -1974.\n\nOkay, so now I have -282*d equals -1974. I need to solve",
+          "is_correct": false,
+          "stats": {
+            "total_energy": 14495.441047777413,
+            "tokenization_energy": 0.7030477774143219,
+            "inference_energy": 14494.737999999998,
+            "energy_per_token": 26.07093713629031,
+            "time": 300.13766837120056,
+            "components": {
+              "embeddings": 217.3497944207195,
+              "attention": 6585.2088484218,
+              "ffn": 8036.312215232593,
+              "layernorm": 187.38811749100938,
+              "output_layer": 688.70419866824
+            },
+            "num_tokens": 556
+          }
+        }
+      ],
+      "summary": {
+        "examples": 1,
+        "avg_energy": 14495.441047777413,
+        "avg_time": 300.13766837120056,
+        "energy_per_token": 26.07093713629031,
+        "accuracy": 0.0,
+        "carbon_emissions": 442.91625423764316
+      }
+    }
+  }
+}

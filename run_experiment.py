@@ -87,8 +87,8 @@ def run_math(args):
         num_examples=args.num_examples,
         verbose=args.verbose,
         device_map=args.device_map,
-        temperature=args.temperature,
-        top_p=args.top_p,
+        temperature=0,
+        top_p=0.9,
         high_mode=args.high_mode,
         low_mode=args.low_mode,
         ctx_threshold=args.ctx_threshold,
@@ -317,5 +317,19 @@ if __name__ == "__main__":
 
 
 
-# cmd for testing mbpp
-# python run_experiment.py --task mbpp --model deepseek-ai/deepseek-coder-1.3b-instruct --modes fp16 int8_vanilla int4_vanilla adaptive --num_examples 1  --device_map cuda --out results_mbpp_coder.json
+## cmd for testing mbpp
+
+# coder 50 samples
+# python run_experiment.py --task mbpp --model deepseek-ai/deepseek-coder-1.3b-instruct --modes fp16 int8_vanilla int4_vanilla adaptive --num_examples 50  --device_map cuda --out results/results_mbpp_coder_50examples.json
+
+# qwen distill 50 samples
+# python run_experiment.py --task mbpp --model deepseek-ai/DeepSeek-R1-Distill-Qwen-1.5B --modes fp16 int8_vanilla int4_vanilla adaptive --num_examples 50  --device_map cuda --out results/results_mbpp_qwen_50examples.json
+
+
+## cmd for math
+
+# coder 50 samples 不可行 要直接回答不要写代码
+# python run_experiment.py --task math --model deepseek-ai/deepseek-coder-1.3b-instruct --modes fp16 int8_vanilla int4_vanilla adaptive --num_examples 1  --device_map cuda --out results/results_math_coder_50examples.json
+
+# qwen 50 samples
+# python run_experiment.py --task math --model deepseek-ai/DeepSeek-R1-Distill-Qwen-1.5B --modes fp16 int8_vanilla int4_vanilla adaptive --num_examples 1  --device_map cuda --out results/results_math_qwen_50examples.json
