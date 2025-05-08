@@ -334,18 +334,10 @@ def test_generation_MBPP(
 
                 for ex in tqdm(ds, desc="MBPP ADAPTIVE"):
                     # prepare prompt
-                    # hdr = "output only the code, no explanation: "
-                    prompt_body = ex['text']
-                    # prompt = f"<｜begin▁of▁sentence｜><｜User｜>{hdr}{prompt_body}<｜Assistant｜><think>"
-                    prompt= f"""
-                    # Instruction: {prompt_body}
-                    # Function Signature:
-                    def function_name(arguments):
-                        '''
-                        {prompt_body}
-                        '''
-                        # Let's think step by step:
-                    """
+                    task = ex['text']
+                    test = "\n".join(ex['test_list'])
+                    prompt_body = f"You are an expert Python programmer, and here is your task: {task} Your code should pass these tests:\n\n{test}\n[BEGIN]"
+                    prompt = f"<｜begin▁of▁sentence｜><｜User｜>{prompt_body}<｜Assistant｜><think>"
                     # record input length
                     input_ids = tokenizer(prompt, return_tensors='pt', truncation=True, max_length=512).input_ids.to(agent.high_model.device)
                     input_len = input_ids.size(1)
@@ -359,18 +351,22 @@ def test_generation_MBPP(
                         top_p=top_p
                     )
                     # extract and decode new tokens as code
-                    gen_tokens = gen_ids[0, input_len:]
-                    pred_code = tokenizer.decode(gen_tokens, skip_special_tokens=True)
+                    gen_text = tokenizer.decode(gen_ids[0], skip_special_tokens=True)
+                    gen_code = extract_clean_function_code_from_output(gen_text)
+
+                    # gen_tokens = gen_ids[0, input_len:]
+                    # pred_code = tokenizer.decode(gen_tokens, skip_special_tokens=True)
 
                     # evaluate pass@1
-                    is_corr = evaluate_generated_code(pred_code, ex['test_list'])
+                    is_corr = evaluate_generated_code(gen_code, ex['test_list'])
                     correct += int(is_corr)
                     total_tokens += stats.get('num_tokens', 1)
 
                     examples.append({
                         'prompt': prompt,
                         'ground_truth_code': ex['code'],
-                        'generated_code': pred_code,
+                        'generated_text':gen_text,
+                        'generated_code': gen_code,
                         'test_list': ex['test_list'],
                         'is_correct': is_corr,
                         'stats': stats

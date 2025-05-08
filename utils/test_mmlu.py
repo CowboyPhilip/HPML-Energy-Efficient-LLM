@@ -133,5 +133,5 @@ def test_quantized_models_on_mmlu(
             "accuracy": 100 * all_correct / all_samples,
         }
 
-        print("summary": summary[mode])
+        print("summary", summary[mode])
     return summary

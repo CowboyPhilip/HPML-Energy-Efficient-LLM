@@ -175,7 +175,7 @@ class AdaptiveQuantGenerator:
             outputs = model.generate(
                 **inputs,
                 max_new_tokens=max_new_tokens,
-                do_sample=True,
+                do_sample=(temperature>0),
                 temperature=temperature,
                 top_p=top_p,
                 return_dict_in_generate=True,
