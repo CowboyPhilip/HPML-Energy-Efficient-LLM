@@ -19,61 +19,63 @@ import ast
 import contextlib
 import io
 
-def extract_clean_function_code_from_output(text: str):
+def extract_clean_function_code_from_output(text: str) -> str:
     """
-    从 LLM 输出中提取有效函数定义。优先解析 [BEGIN]... 区块，
+    从 LLM 输出中提取第一个有效函数定义。优先解析 [BEGIN]... 区块，
     如果不存在，则尝试提取 markdown ```python``` 块或 def 函数块。
-    返回 AST 校验通过的函数代码。
+    返回 AST 校验通过的第一个函数代码。
     """
-    def extract_def_block(raw: str) -> str:
-        """从任意 code block 文本中提取 def 函数定义"""
-        # 只保留 def 开头的函数定义及其缩进块
+
+    def extract_all_def_blocks(raw: str) -> list[str]:
+        blocks = []
         lines = raw.strip().splitlines()
-        def_lines = []
+        current_block = []
         inside_func = False
+
         for line in lines:
             if re.match(r"^def\s+\w+\(.*\):", line):
+                if current_block:
+                    blocks.append("\n".join(current_block))
+                    current_block = []
                 inside_func = True
-                def_lines.append(line)
+                current_block.append(line)
             elif inside_func and (line.startswith("    ") or line.startswith("\t")):
-                def_lines.append(line)
+                current_block.append(line)
             elif inside_func:
-                break
-        return "\n".join(def_lines)
+                blocks.append("\n".join(current_block))
+                current_block = []
+                inside_func = False
 
-    # 1. 优先尝试 [BEGIN]<｜Assistant｜><think> 格式
+        if current_block:
+            blocks.append("\n".join(current_block))
+
+        return blocks
+
+    # 1. 尝试 [BEGIN] block
     begin_pattern = r"\[BEGIN\]<｜Assistant｜><think>\n(.*?)\n\[END\]<｜Assistant｜><think>"
     match = re.search(begin_pattern, text, re.DOTALL)
     if match:
         block = match.group(1).strip()
-
-        # 如果内部还有 ```python ... ``` 块，进一步提取
         md_inner = re.search(r"```python\n(.*?)```", block, re.DOTALL | re.IGNORECASE)
-        if md_inner:
-            code_block = extract_def_block(md_inner.group(1))
-        else:
-            code_block = extract_def_block(block)
+        code_block = md_inner.group(1) if md_inner else block
     else:
-        # 2. fallback: markdown python 块
         md_match = re.search(r"```python\n(.*?)```", text, re.DOTALL | re.IGNORECASE)
         if md_match:
-            code_block = extract_def_block(md_match.group(1))
+            code_block = md_match.group(1)
         else:
-            # 3. fallback: 第一个 def 函数块
-            def_match = re.search(r"(def\s+\w+\(.*?\):(?:\n(?: {4}|\t).*)*)", text, re.DOTALL)
-            if def_match:
-                code_block = def_match.group(1).strip()
-            else:
-                return "code block not found"
+            code_block = text
 
-    # 4. AST 校验
-    try:
-        tree = ast.parse(code_block)
-        func_defs = [node for node in tree.body if isinstance(node, ast.FunctionDef)]
-        return "\n\n".join([ast.unparse(func) for func in func_defs]) if func_defs else None
-    except Exception as e:
-        print("AST Error Input:\n", code_block)
-        return "ast grammar error!"
+    # 2. 提取并返回第一个合法 def 函数
+    for code in extract_all_def_blocks(code_block):
+        try:
+            tree = ast.parse(code)
+            func_defs = [node for node in tree.body if isinstance(node, ast.FunctionDef)]
+            if func_defs:
+                return ast.unparse(func_defs[0])
+        except Exception:
+            continue
+
+    return "ast grammar error!"
 
 def compare_generation_energy(model_name, prompt, quantization_modes=['fp32'], verbose=True, device_map: str = "auto"):
     """
@@ -410,11 +412,9 @@ def test_generation_MBPP(
                 test = "\n".join(ex['test_list'])
                 prompt_body = f"You are an expert Python programmer, and here is your task: {task} Your code should pass these tests:\n\n{test}\n[BEGIN]"
                 prompt = f"<｜begin▁of▁sentence｜><｜User｜>{prompt_body}<｜Assistant｜><think>"
-                # tokenized_prompt = tokenizer(prompt, return_tensors='pt',
-                #             padding=True, truncation=True, max_length=256)
+
                 # inference
                 try:
-                    # logits, stats = tracker.measure_text(tokens.input_ids.to(model.device), tokenizer, temperature, top_p)
                     # print("===1===")
                     gen_ids, stats = tracker.measure_generation(prompt, tokenizer, temperature, top_p)
                 except torch.cuda.OutOfMemoryError:
