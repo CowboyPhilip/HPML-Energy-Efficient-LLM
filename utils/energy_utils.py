@@ -293,7 +293,7 @@ class EnergyTracker:
                     temperature=temperature,
                     top_p=top_p,
                     do_sample=(temperature > 0),
-                    max_new_tokens=256,
+                    max_new_tokens=128,
                     pad_token_id=tokenizer.eos_token_id
                 )
         except Exception as e:
