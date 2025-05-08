@@ -6,6 +6,7 @@ AdaptiveQuantGenerator: single-shot adaptive quantization based on prompt length
 - Instantiates one EnergyTracker per precision once
 - Uses one-shot .generate() to minimize monitor overhead
 - Selects tracker/model per example, reusing monitors
+Fix: clear component energy logs at each measurement to avoid accumulation.
 """
 import time
 import numpy as np
@@ -19,6 +20,9 @@ from utils.memory_utils import print_gpu_memory
 # Monkey-patch EnergyTracker to context manager and save_results
 
 def _et_enter(self):
+    # clear previous component energy entries
+    for k in getattr(self, 'comp_energy', {}):
+        self.comp_energy[k].clear()
     if getattr(self, 'zeus', None):
         try:
             self.zeus.begin_window('inference')
