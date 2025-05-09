@@ -60,7 +60,5 @@ This repository provides **experiments.ipynb** as the single entry point to eval
 -   **Overall plot** compares total energy across modes/tasks.
 -   **Component plot** shows energy consumed by embeddings, attention, FFN, etc., for a given mode.
 
-## Notes
-
--   You can re-run with different configs without restarting the kernel.
--   Results JSON contains full per-example stats under each mode.
+## Wanbd URL：
+https://wandb.ai/HPML-Energy-Efficient-LLM?shareProfileType=copy
