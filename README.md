@@ -1,64 +1,141 @@
-# Energy‐Efficient LLM Benchmark
+# Adaptive Quantization and Kernel-Level Optimization for Energy-efficient Edge AI Inference of DeepSeek Models
 
-This repository provides **experiments.ipynb** as the single entry point to evaluate energy, latency and accuracy across several tasks (generation, MATH, MBPP, MMLU, GLUE) and quantization/kernel modes.
+Team Information
 
-## Prerequisites
+- **Team Name**: *Energy-Efficient LLM*
+- **Members**
+  - Jiayi Yang (jy3475)
+  - Feiyang Chen (fc2795)
+  - Kuo Gong (kg3175)
 
--   Python 3.8+ on a CUDA-capable GPU
--   Internet access to download models & datasets
+------
 
-## Quick Start
+## 1. Problem Statement
 
-1. **Open** `experiments.ipynb` in Colab or Jupyter.
-2. ```sh
-    # run this cell if you are in colab with a single notebook opened, otherwise ignore this cell
-    !git clone https://github.com/CowboyPhilip/HPML-Energy-Efficient-LLM
-    %cd HPML-Energy-Efficient-LLM 
-    ```
-3. **Run** the first cell to install all dependencies.
+Large-language models (LLMs) deliver impressive accuracy but at a high energy cost.
+Our goal is to quantify the trade-offs between accuracy, latency and energy/CO₂ when the same model is deployed with different quantization + attention-kernel combinations, and to test an *adaptive* strategy that switches precision on-the-fly.
 
-    ```
-    # 1. Install dependencies
-    !pip install --upgrade pip setuptools
-    !pip install \
-        transformers \
-        bitsandbytes \
-        zeus-ml \
-        torch \
-        datasets \
-        evaluate \
-        scikit-learn \
-        geocoder \
-        requests \
-        flash-attn==2.0.5 \
-        triton==2.0.0 \
-        vllm \
-        numpy
-    ```
-4. **Edit** the **Config** cell at the top:
+------
 
-    - `cfg["task"]`: one of `"generation"`, `"math"`, `"mbpp"`, `"mmlu"`, `"glue"`
-    - `cfg["model"]`: e.g. `"deepseek-ai/deepseek-coder-1.3b-instruct"`
-    - `cfg["modes"]`: list of quant+kernel modes, e.g.
-        
-        ```python
-        ["fp16_vanilla","int8_vanilla","int4_vanilla","adaptive"]
-        ```
-    - Other fields: dataset_name, dataset_config, split, num_examples, prompt, tokens, etc.
-5. **Run all cells**. The notebook will:
-    - Measure per-token energy & latency with `EnergyTracker`
-    - Switch precision on-the-fly for `"adaptive"` mode
-    - Print a summary table of **avg energy (J)**, **latency (s)**, **accuracy (%)**, and **CO₂ (g)**
-    - Generate two plots:
-        - `plot_energy_comparison(results)` for overall energy comparison
-        - `plot_component_energy(results, task_type, quant_mode)` for component-level breakdown
-    - Save raw metrics to `cfg["output_file"]` (default `results.json`)
+## 2. Model Description
 
-## Results Interpretation
+**Model Suite**
 
--   **Summary table** shows per-mode metrics for the selected task.
--   **Overall plot** compares total energy across modes/tasks.
--   **Component plot** shows energy consumed by embeddings, attention, FFN, etc., for a given mode.
+- DeepSeek-Coder 1.3B (Code generation)
+- DeepSeek-Qwen 1.5B (General reasoning)
 
-## Wanbd URL：
-https://wandb.ai/HPML-Energy-Efficient-LLM?shareProfileType=copy
+Loaded via Hugging Face; standard Transformer backbone → amenable to low-bit quantization & custom kernels.
+
+**Benchmark Datasets**
+
+- MBPP • Python code generation with embedded test cases
+- MATH • Mathematical reasoning, exact-answer format
+- MMLU • 57-domain multiple-choice knowledge test
+
+Unified prompt templates ensure fair, cross-task evaluation.
+
+**Solution Architecture**
+
+Our system architecture is modular. The load_llm module handles model instantiation with chosen quantization and kernel. The AdaptiveQuantGenerator manages precision switching. EnergyTracker handles measurements, and we include a CO₂ calculator for sustainability reporting.
+
+![architecture_diagram](F:\Columbia\25Spring\6998 HPML\Final\architecture_diagram.png)
+
+## 3. Final Results Summary
+
+(50 MBPP test samples on a single NVIDIA T4 GPU)
+
+
+
+
+
+------
+
+## 4. Reproducibility Instructions
+
+### A. Requirements
+
+```
+# CUDA-11.x + single NVIDIA T4 GPU  – tested on GCP T4
+python -m pip install --upgrade pip setuptools
+
+pip install --upgrade pip setuptools
+pip install \
+    transformers \
+    bitsandbytes \
+    zeus-ml \
+    torch \
+    datasets \
+    evaluate \
+    scikit-learn \
+    geocoder \
+    requests \
+    numpy \
+    wandb
+pip install \
+    flash-attn==2.0.5 \
+    triton==2.0.0 \
+    vllm
+```
+
+------
+
+### B. Wandb Dashboard
+
+All raw runs & plots: **https://wandb.ai/HPML-Energy-Efficient-LLM**
+
+------
+
+### C. Training / Inference
+
+Our repo only benchmarks **inference**; no additional training is required.
+
+------
+
+### D. Evaluation
+
+#### **Preferred (GCP VM with T4 GPU)**
+
+```
+python run_experiment.py \
+  --task mbpp \
+  --model deepseek-ai/deepseek-coder-1.3b-instruct \
+  --modes fp16_vanilla int8_vanilla int4_vanilla \
+  --num_examples 50 \
+  --out results/results_mbpp_coder_50examples_only_adaptive.json
+```
+
+It will:
+
+- Measure per-token energy & latency with `EnergyTracker`
+- Switch precision on-the-fly for `"adaptive"` mode
+- Print a summary table of **avg energy (J)**, **latency (s)**, **accuracy (%)**, and **CO₂ (g)**
+- Save raw metrics to `cfg["output_file"]` (default `results.json`)
+
+------
+
+### E. Quick-start: Minimum Reproducible Result
+
+```
+# 1. Clone and install
+git clone https://github.com/CowboyPhilip/HPML-Energy-Efficient-LLM.git
+cd HPML-Energy-Efficient-LLM
+pip install # see A.
+
+# 2. Run a 5-sample smoke test
+python run_experiment.py \
+  --task mbpp \
+  --model deepseek-ai/deepseek-coder-1.3b-instruct \
+  --modes fp16_vanilla int8_vanilla int4_vanilla\
+  --num_examples 5 \
+  --out results/smoke.json
+```
+
+This produces a quick JSON with energy/latency/accuracy.
+
+------
+
+## 5. Notes
+
+- Scripts live in `utils/` and the root; entry-point is `run_experiment.py`.
+- Energy is measured with **ZeusMonitor**; you can lower overhead by reducing hook granularity in `energy_utils.py`.
+- Contact: *jy3475@columbia.edu, fc2795@columbia.edu*, kg3175@columbia.edu

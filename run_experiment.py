@@ -328,7 +328,7 @@ if __name__ == "__main__":
 
 ## cmd for math
 
-# coder 50 samples 不可行 要直接回答不要写代码
+# coder 50 samples
 # python run_experiment.py --task math --model deepseek-ai/deepseek-coder-1.3b-instruct --modes fp16 int8_vanilla int4_vanilla adaptive --num_examples 1  --device_map cuda --out results/results_math_coder_50examples.json
 
 # qwen 50 samples
