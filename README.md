@@ -38,7 +38,7 @@ Unified prompt templates ensure fair, cross-task evaluation.
 
 Our system architecture is modular. The load_llm module handles model instantiation with chosen quantization and kernel. The AdaptiveQuantGenerator manages precision switching. EnergyTracker handles measurements, and we include a CO₂ calculator for sustainability reporting.
 
-![architecture_diagram](F:\Columbia\25Spring\6998 HPML\Final\architecture_diagram.png)
+![architecture_diagram](architecture_diagram.png)
 
 ## 3. Final Results Summary
 
