@@ -44,17 +44,24 @@ Our system architecture is modular. The load_llm module handles model instantiat
 
 Test coder-1.3b-instruct with 50 MBPP samples
 
-
-
-|Quantization Mode| Metric                 | Value         |
-
-|a|------------------------|---------------|
-|b| Accuracy               | 44.1%         |
-|c| Average Inference Time | 97 s          |
-|d| Energy per Token       | 16.5 J        |
-|e| Training Iterations/s  | 1.54 it/s     |
-|f| Device                 | NVIDIA T4 GPU |
-
+| Quantization Mode | Metric                 | Value     |
+|-------------------|------------------------|-----------|
+| FP16              | Accuracy               | 42%       |
+|                   | Average Inference Time | 63.67  s  |
+|                   | Energy per Token       | 12.26 J   |
+|                   | Training Iterations/s  | 1.57 it/s  |
+| INT8              | Accuracy               | 42%       |
+|                   | Average Inference Time | 66.17 s      |
+|                   | Energy per Token       | 11.87 J    |
+|                   | Training Iterations/s  | 1.48 it/s  |
+| INT4              | Accuracy               | 32%       |
+|                   | Average Inference Time | 60.85 s      |
+|                   | Energy per Token       | 11.07 J    |
+|                   | Training Iterations/s  | 1.51 it/s  |
+| Adaptive          | Accuracy               | 38%       |
+|                   | Average Inference Time | 57.44 s      |
+|                   | Energy per Token       | 22.86 J     |
+|                   | Training Iterations/s  | 1.50 it/s  |
 
 
 ------
