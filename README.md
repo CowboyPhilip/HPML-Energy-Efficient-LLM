@@ -42,9 +42,18 @@ Our system architecture is modular. The load_llm module handles model instantiat
 
 ## 3. Final Results Summary
 
-(50 MBPP test samples on a single NVIDIA T4 GPU)
+Test coder-1.3b-instruct with 50 MBPP samples
 
 
+
+|Quantization Mode| Metric                 | Value         |
+
+|a|------------------------|---------------|
+|b| Accuracy               | 44.1%         |
+|c| Average Inference Time | 97 s          |
+|d| Energy per Token       | 16.5 J        |
+|e| Training Iterations/s  | 1.54 it/s     |
+|f| Device                 | NVIDIA T4 GPU |
 
 
 
