@@ -117,7 +117,7 @@ python run_experiment.py \
   --model deepseek-ai/deepseek-coder-1.3b-instruct \
   --modes fp16_vanilla int8_vanilla int4_vanilla \
   --num_examples 50 \
-  --out results/results_mbpp_coder_50examples_only_adaptive.json
+  --out results/results_mbpp_coder_50examples.json
 ```
 
 It will:
@@ -125,7 +125,7 @@ It will:
 - Measure per-token energy & latency with `EnergyTracker`
 - Switch precision on-the-fly for `"adaptive"` mode
 - Print a summary table of **avg energy (J)**, **latency (s)**, **accuracy (%)**, and **CO₂ (g)**
-- Save raw metrics to `cfg["output_file"]` (default `results.json`)
+- Save raw metrics to `cfg["output_file"]` (default `results.json`), which is specified by --out <your_file_path>
 
 ------
 
